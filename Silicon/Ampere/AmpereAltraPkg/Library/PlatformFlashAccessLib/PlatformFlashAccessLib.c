@@ -17,6 +17,7 @@
 #include <Protocol/MmCommunication2.h>
 
 EFI_MM_COMMUNICATION2_PROTOCOL *mMmCommunication = NULL;
+EFI_MM_COMMUNICATION_PROTOCOL *mMmCommunication1 = NULL;
 
 #define EFI_MM_MAX_PAYLOAD_U64_E 10
 #define EFI_MM_MAX_PAYLOAD_SIZE  (EFI_MM_MAX_PAYLOAD_U64_E * sizeof (UINT64))
@@ -134,9 +135,17 @@ MmFlashUpdate (
                     (VOID **)&mMmCommunication
                     );
 
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Can't locate gEfiMmCommunication2ProtocolGuid.\n", __FUNCTION__));
-      return Status;
+    if (EFI_ERROR (Status) && mMmCommunication1 == NULL) {
+      Status = gBS->LocateProtocol (
+                      &gEfiMmCommunicationProtocolGuid,
+                      NULL,
+                      (VOID **)&mMmCommunication1
+                      );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a: Can't locate gEfiMmCommunication(2)ProtocolGuid.\n", __FUNCTION__));
+        return Status;
+      }
     }
   }
 
@@ -149,12 +158,22 @@ MmFlashUpdate (
     UefiMmCreateSysFwuReq ((VOID *)&MmData, sizeof (MmData));
 
     Size = sizeof (EFI_MM_COMM_HEADER_NOPAYLOAD) + sizeof (MmData);
-    Status = mMmCommunication->Communicate (
-                                 mMmCommunication,
-                                 (VOID *)&mEfiMmSysFwuReq,
-                                 (VOID *)&mEfiMmSysFwuReq,
-                                 &Size
-                                 );
+    
+    if (mMmCommunication) {
+      Status = mMmCommunication->Communicate (
+                                   mMmCommunication,
+                                   (VOID *)&mEfiMmSysFwuReq,
+                                   (VOID *)&mEfiMmSysFwuReq,
+                                   &Size
+                                   );
+    } else {
+      Status = mMmCommunication1->Communicate (
+                                    mMmCommunication1,
+                                    (VOID *)&mEfiMmSysFwuReq,
+                                    &Size
+                                    );
+    }
+    
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
