@@ -33,6 +33,7 @@
   PcdLib
   PeimEntryPoint
   ResetSystemLib
+  AmpereCpuLib
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

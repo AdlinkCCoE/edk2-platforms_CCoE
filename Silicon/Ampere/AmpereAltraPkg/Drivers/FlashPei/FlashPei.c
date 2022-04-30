@@ -16,6 +16,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/ResetSystemLib.h>
+#include <Library/AmpereCpuLib.h>
 
 /**
   Entry point function for the PEIM
@@ -33,15 +34,18 @@ FlashPeiEntryPoint (
   IN CONST EFI_PEI_SERVICES    **PeiServices
   )
 {
-  CHAR8               BuildUuid[PcdGetSize (PcdPlatformConfigUuid)];
-  CHAR8               StoredUuid[PcdGetSize (PcdPlatformConfigUuid)];
+  CHAR8               BuildUuid[PcdGetSize (PcdPlatformConfigUuid)+sizeof(BOOLEAN)];
+  CHAR8               StoredUuid[sizeof (BuildUuid)];
   EFI_STATUS          Status;
   UINTN               FWNvRamStartOffset;
   UINT32              FWNvRamSize;
   UINTN               NvRamAddress;
   UINT32              NvRamSize;
+  BOOLEAN             IsAc01;
 
+  IsAc01 = IsAc01Processor ();
   CopyMem ((VOID *)BuildUuid, PcdGetPtr (PcdPlatformConfigUuid), sizeof (BuildUuid));
+  BuildUuid[sizeof (BuildUuid)-sizeof(BOOLEAN)]=IsAc01;
 
   NvRamAddress = PcdGet64 (PcdFlashNvStorageVariableBase64);
   NvRamSize = FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
