@@ -36,6 +36,7 @@ FlashPeiEntryPoint (
 {
   CHAR8               BuildUuid[PcdGetSize (PcdPlatformConfigUuid)+sizeof(BOOLEAN)];
   CHAR8               StoredUuid[sizeof (BuildUuid)];
+  CHAR8               NullUuid[PcdGetSize (PcdPlatformConfigUuid)];
   EFI_STATUS          Status;
   UINTN               FWNvRamStartOffset;
   UINT32              FWNvRamSize;
@@ -45,7 +46,7 @@ FlashPeiEntryPoint (
 
   IsAc01 = IsAc01Processor ();
   CopyMem ((VOID *)BuildUuid, PcdGetPtr (PcdPlatformConfigUuid), sizeof (BuildUuid));
-  BuildUuid[sizeof (BuildUuid)-sizeof(BOOLEAN)]=IsAc01;
+  BuildUuid[sizeof (BuildUuid)-sizeof(IsAc01)]=IsAc01;
 
   NvRamAddress = PcdGet64 (PcdFlashNvStorageVariableBase64);
   NvRamSize = FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
@@ -85,6 +86,14 @@ FlashPeiEntryPoint (
     return Status;
   }
 
+  DEBUG ((DEBUG_INFO, "StoredUuid = "));
+  for (int i=0; i< sizeof (StoredUuid)-sizeof(IsAc01); i++) {
+    DEBUG ((DEBUG_INFO, "%x ", StoredUuid[i]));
+  }
+  DEBUG ((DEBUG_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "stored IsAc01 = %x\n", StoredUuid[sizeof(StoredUuid)-sizeof(IsAc01)]));
+  DEBUG ((DEBUG_INFO, "IsAc01 = %x\n", IsAc01));
+
   if (CompareMem ((VOID *)StoredUuid, (VOID *)BuildUuid, sizeof (BuildUuid)) != 0) {
     DEBUG ((DEBUG_INFO, "BUILD UUID Changed, Update Storage with NVRAM FV\n"));
 
@@ -114,12 +123,17 @@ FlashPeiEntryPoint (
       return Status;
     }
 
-    Status = NVParamClrAll ();
-    if (!EFI_ERROR (Status)) {
-      //
-      // Trigger reset to use default NVPARAM
-      //
-      ResetCold ();
+    for (int i=0; i<sizeof(NullUuid); i++) {
+      NullUuid[i] = 0xff;
+    }
+    if (CompareMem ((VOID *)StoredUuid, (VOID *)NullUuid, sizeof (NullUuid)) != 0) {
+      Status = NVParamClrAll ();
+      if (!EFI_ERROR (Status)) {
+        //
+        // Trigger reset to use default NVPARAM
+        //
+        ResetCold ();
+      }
     }
   } else {
     DEBUG ((DEBUG_INFO, "Identical UUID, copy stored NVRAM to RAM\n"));
