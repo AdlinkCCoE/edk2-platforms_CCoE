@@ -44,15 +44,16 @@
 **/
 
 #include <PiPei.h>
-
+#include <Guid/RootComplexConfigHii.h>
 #include <Guid/PlatformInfoHob.h>
 #include <Guid/RootComplexInfoHob.h>
 #include <Library/AmpereCpuLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/NVParamLib.h>
+#include <Library/PeiServicesLib.h>
 #include <NVParamDef.h>
-
+#include <Ppi/ReadOnlyVariable2.h>
 #include "RootComplexNVParam.h"
 
 STATIC
@@ -250,7 +251,7 @@ GetLaneAllocation (
     case 3:
     case 4:
       RootComplex->Pcie[RPIndex].MaxWidth = 1 << Width;
-      RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_GEN3;
+      //RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_GEN3;
       RootComplex->Pcie[RPIndex].Active = TRUE;
       break;
 
@@ -278,7 +279,7 @@ GetLaneAllocation (
       case 3:
       case 4:
         RootComplex->Pcie[RPIndex].MaxWidth = 1 << Width;
-        RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_GEN3;
+        //RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_GEN3;
         RootComplex->Pcie[RPIndex].Active = TRUE;
         break;
 
@@ -468,9 +469,38 @@ GetMaxSpeedGen (
   UINT8 ErrataSpeedRcb[MaxPcieControllerOfRootComplexA] = { LINK_SPEED_GEN1, LINK_SPEED_GEN1, LINK_SPEED_GEN1, LINK_SPEED_GEN1 };      // RootComplexTypeB PCIE_ERRATA_SPEED1
   UINT8 Idx, Controller;
   UINT8 *MaxGen;
-
+  EFI_STATUS                           Status;
+  UINTN                                DataSize;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI      *VariablePpi;
+  ROOT_COMPLEX_CONFIG_VARSTORE_DATA    RootComplexConfig;
+  BOOLEAN                              ConfigFound;
+  
   ASSERT (MaxPcieControllerOfRootComplexA == 4);
   ASSERT (MaxPcieController == 8);
+
+  //
+  // Get the Root Complex config from NVRAM
+  //
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiReadOnlyVariable2PpiGuid,
+             0,
+             NULL,
+             (VOID **)&VariablePpi
+             );
+  if (!EFI_ERROR (Status)) {
+    DataSize = sizeof (RootComplexConfig);
+    Status = VariablePpi->GetVariable (
+                            VariablePpi,
+                            ROOT_COMPLEX_CONFIG_VARSTORE_NAME,
+                            &gRootComplexConfigFormSetGuid,
+                            NULL,
+                            &DataSize,
+                            &RootComplexConfig
+                            );
+    if (!EFI_ERROR (Status)) {
+      ConfigFound = TRUE;
+    }
+  }
 
   //
   // Due to hardware errata, for A0/A1*
@@ -510,11 +540,29 @@ GetMaxSpeedGen (
     Controller = RootComplex->MaxPcieController;
   }
   for (Idx = 0; Idx < Controller; Idx++) {
+  if (
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN1) ||  		
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN2) ||
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN3) ||  		  		  
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN4)  		  
+  )
+  	MaxGen [Idx] = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] : LINK_SPEED_GEN3;
+  else
+	MaxGen [Idx] = LINK_SPEED_GEN3;  
     RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? MaxGen[Idx] : LINK_SPEED_NONE;
   }
 
   if (RootComplex->Type == RootComplexTypeB) {
     for (Idx = MaxPcieControllerOfRootComplexA; Idx < MaxPcieController; Idx++) {
+      if (
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN1) ||  		
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN2) ||
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN3) ||  		  		  
+  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN4)  		  
+  )
+  	MaxGen[Idx - MaxPcieControllerOfRootComplexA] = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] : LINK_SPEED_GEN3;
+      else 
+	      MaxGen[Idx] = LINK_SPEED_GEN3;
       RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ?
                                       MaxGen[Idx - MaxPcieControllerOfRootComplexA] : LINK_SPEED_NONE;
     }

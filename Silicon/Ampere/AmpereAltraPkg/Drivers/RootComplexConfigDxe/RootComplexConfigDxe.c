@@ -29,7 +29,7 @@
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
-
+#include <Library/IoLib.h>
 #include "RootComplexConfigDxe.h"
 
 BOOLEAN    mReadOnlyStrongOrdering;
@@ -480,6 +480,10 @@ DriverCallback (
     case 2:
       Value->u8 = PcieRCDevMapHighDefaultSetting ((QuestionId - 0x8002) / MAX_EDITABLE_ELEMENTS, PrivateData);
       break;
+
+    case 3:
+      Value->u8 = PcieRCGetMaxGen((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData);
+      break;
     }
     break;
 
@@ -543,6 +547,75 @@ PcieRCActiveDefaultSetting (
   AC01_ROOT_COMPLEX *RootComplex = GetRootComplex (RCIndex);
 
   return RootComplex->DefaultActive;
+}
+
+UINT8
+PcieRCGetMaxGen (
+  IN UINTN			RCIndex,
+  IN SCREEN_PRIVATE_DATA	*PrivateData
+  )
+{
+  AC01_ROOT_COMPLEX *RootComplex = GetRootComplex(RCIndex);
+  return RootComplex->Pcie[0].MaxGen;
+}
+
+VOID *
+CreatePCIeGenSpeedOptions(
+  AC01_ROOT_COMPLEX *RootComplex
+  )
+{
+  EFI_STRING_ID  StringId;
+  VOID           *OptionsOpCodeHandle;
+
+  OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (OptionsOpCodeHandle != NULL);
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN1);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed1
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN2);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed2
+    );
+    
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN3);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed3
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN4);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed4
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN_NONE);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed0
+    );
+
+ return OptionsOpCodeHandle;
 }
 
 VOID *
@@ -787,6 +860,20 @@ PcieRCScreenSetup (
       );
   }
 
+  OptionsOpCodeHandle = CreatePCIeGenSpeedOptions (RootComplex);
+      
+  HiiCreateOneOfOpCode (
+    StartOpCodeHandle,
+    0x8005 +  MAX_EDITABLE_ELEMENTS * RCIndex,
+    VARSTORE_ID,
+    PCIE_SPEED_OFFSET+sizeof(UINT8) * RCIndex,
+    STRING_TOKEN (STR_PCIE_GEN_SPEED),
+    STRING_TOKEN (STR_PCIE_GEN_SPEED_HELP),
+    QuestionFlags,
+    EFI_IFR_NUMERIC_SIZE_1,
+    OptionsOpCodeHandle,
+    NULL
+    );
   HiiUpdateForm (
     PrivateData->HiiHandle,     // HII handle
     &gPcieFormSetGuid,          // Formset GUID
@@ -1196,6 +1283,7 @@ RootComplexDriverEntry (
       VarStoreConfig->RCBifurcationHigh[RCIndex] = RootComplex->DevMapHigh;
       VarStoreConfig->RCStatus[RCIndex] = RootComplex->Active;
       IsUpdated = TRUE;
+      VarStoreConfig->PCIeMaxGenSpeed[RCIndex] = RootComplex->Pcie[0].MaxGen ;
     }
   }
 

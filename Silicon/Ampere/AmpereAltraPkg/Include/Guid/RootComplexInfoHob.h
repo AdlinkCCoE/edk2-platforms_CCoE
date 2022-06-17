@@ -43,6 +43,15 @@ typedef enum {
   MaxDevMapMode = DevMapMode4
 } DEV_MAP_MODE;
 
+typedef enum {
+ PCIeSpeed0 = LINK_SPEED_NONE,
+ PCIeSpeed1 = LINK_SPEED_GEN1,
+ PCIeSpeed2 = LINK_SPEED_GEN2,
+ PCIeSpeed3 = LINK_SPEED_GEN3,
+ PCIeSpeed4 =LINK_SPEED_GEN4,
+ MaxPCIeSpdeed = PCIeSpeed4
+} PCIE_GEN_SPEED;
+
 //
 // PCIe controller index
 //

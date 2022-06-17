@@ -25,7 +25,7 @@ extern UINT8 RootComplexConfigVfrBin[];
 //
 extern UINT8 RootComplexConfigDxeStrings[];
 
-#define MAX_EDITABLE_ELEMENTS 3
+#define MAX_EDITABLE_ELEMENTS 4
 #define RC0_STATUS_OFFSET  \
   OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, RCStatus[0])
 #define RC0_BIFUR_LO_OFFSET  \
@@ -35,6 +35,8 @@ extern UINT8 RootComplexConfigDxeStrings[];
 #define SMMU_PMU_OFFSET  \
   OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, SmmuPmu)
 
+#define PCIE_SPEED_OFFSET \
+  OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, PCIeMaxGenSpeed[0])
 #define STRONG_ORDERING_OFFSET  \
   OFFSET_OF (NVPARAM_ROOT_COMPLEX_CONFIG_VARSTORE_DATA, PcieStrongOrdering)
 
@@ -111,4 +113,9 @@ PcieRCActiveDefaultSetting (
   IN SCREEN_PRIVATE_DATA      *PrivateData
   );
 
+UINT8
+PcieRCGetMaxGen (
+  IN UINTN                    RCIndex,
+  IN SCREEN_PRIVATE_DATA      *PrivateData
+  );
 #endif /* BOARD_PCIE_SCREEN_H_ */
