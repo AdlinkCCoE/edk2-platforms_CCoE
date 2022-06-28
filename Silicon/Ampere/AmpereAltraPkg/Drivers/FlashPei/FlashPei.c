@@ -16,8 +16,13 @@
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/ResetSystemLib.h>
+//><ADLINK-PX20220627_01>//
+#include <Library/AmpereCpuLib.h>
+//<<ADLINK-PX20220627_01>//
 
-#define UUID_SIZE     PcdGetSize (PcdPlatformConfigUuid)
+//><ADLINK-PX20220627_01>//
+#define UUID_SIZE     PcdGetSize (PcdPlatformConfigUuid)+sizeof(BOOLEAN)
+//<<ADLINK-PX20220627_01>//
 
 /**
   Entry point function for the PEIM
@@ -37,6 +42,9 @@ FlashPeiEntryPoint (
 {
   CHAR8               BuildUuid[UUID_SIZE];
   CHAR8               StoredUuid[UUID_SIZE];
+//><ADLINK-PX20220627_01>//
+  CHAR8               NullUuid[PcdGetSize (PcdPlatformConfigUuid)];
+//<<ADLINK-PX20220627_01>//
   EFI_STATUS          Status;
   UINTN               FWNvRamStartOffset;
   UINT32              FWNvRamSize;
@@ -44,8 +52,13 @@ FlashPeiEntryPoint (
   UINT32              NvRamSize;
   UINTN               UefiMiscOffset;
   UINT32              UefiMiscSize;
+//><ADLINK-PX20220627_01>//
+  BOOLEAN             IsAc01;
 
+  IsAc01 = IsAc01Processor ();
   CopyMem ((VOID *)BuildUuid, PcdGetPtr (PcdPlatformConfigUuid), UUID_SIZE);
+  BuildUuid[sizeof (BuildUuid)-sizeof(IsAc01)]=IsAc01;
+//<<ADLINK-PX20220627_01>//
 
   NvRamAddress = PcdGet64 (PcdFlashNvStorageVariableBase64);
   NvRamSize = FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
@@ -86,6 +99,16 @@ FlashPeiEntryPoint (
     return Status;
   }
 
+//><ADLINK-PX20220627_01>//
+  DEBUG ((DEBUG_INFO, "StoredUuid = "));
+  for (int i=0; i< sizeof (StoredUuid)-sizeof(IsAc01); i++) {
+    DEBUG ((DEBUG_INFO, "%x ", StoredUuid[i]));
+  }
+  DEBUG ((DEBUG_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "stored IsAc01 = %x\n", StoredUuid[sizeof(StoredUuid)-sizeof(IsAc01)]));
+  DEBUG ((DEBUG_INFO, "IsAc01 = %x\n", IsAc01));
+//<<ADLINK-PX20220627_01>//
+
   if (CompareMem ((VOID *)StoredUuid, (VOID *)BuildUuid, UUID_SIZE) != 0) {
     DEBUG ((DEBUG_INFO, "BUILD UUID Changed, Update Storage with NVRAM FV\n"));
 
@@ -120,13 +143,20 @@ FlashPeiEntryPoint (
       return Status;
     }
 
-    Status = NVParamClrAll ();
-    if (!EFI_ERROR (Status)) {
-      //
-      // Trigger reset to use default NVPARAM
-      //
-      ResetCold ();
+//><ADLINK-PX20220627_01>//
+    for (int i=0; i<sizeof(NullUuid); i++) {
+      NullUuid[i] = 0xff;
     }
+    if (CompareMem ((VOID *)StoredUuid, (VOID *)NullUuid, sizeof (NullUuid)) != 0) {
+      Status = NVParamClrAll ();
+      if (!EFI_ERROR (Status)) {
+        //
+        // Trigger reset to use default NVPARAM
+        //
+        ResetCold ();
+      }
+    }
+//<<ADLINK-PX20220627_01>//
   } else {
     DEBUG ((DEBUG_INFO, "Identical UUID, copy stored NVRAM to RAM\n"));
 

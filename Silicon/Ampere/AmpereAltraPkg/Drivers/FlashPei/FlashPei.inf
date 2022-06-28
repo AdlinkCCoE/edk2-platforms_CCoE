@@ -33,6 +33,9 @@
   PcdLib
   PeimEntryPoint
   ResetSystemLib
+  #><ADLINK-PX20220627_01>#
+  AmpereCpuLib
+  #<<ADLINK-PX20220627_01>#
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
