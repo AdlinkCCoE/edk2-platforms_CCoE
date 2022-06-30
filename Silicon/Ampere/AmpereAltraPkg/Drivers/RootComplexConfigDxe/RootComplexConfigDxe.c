@@ -29,7 +29,9 @@
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
-
+//><ADLINK-PX20220627_01>//
+#include <Library/IoLib.h>
+//<<ADLINK-PX20220627_01>//
 #include "RootComplexConfigDxe.h"
 
 BOOLEAN    mReadOnlyStrongOrdering;
@@ -480,6 +482,12 @@ DriverCallback (
     case 2:
       Value->u8 = PcieRCDevMapHighDefaultSetting ((QuestionId - 0x8002) / MAX_EDITABLE_ELEMENTS, PrivateData);
       break;
+
+//><ADLINK-PX20220627_01>//
+    case 3:
+      Value->u8 = PcieRCGetMaxGen((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData);
+      break;
+//<<ADLINK-PX20220627_01>//
     }
     break;
 
@@ -544,6 +552,77 @@ PcieRCActiveDefaultSetting (
 
   return RootComplex->DefaultActive;
 }
+
+//><ADLINK-PX20220627_01>//
+UINT8
+PcieRCGetMaxGen (
+  IN UINTN			RCIndex,
+  IN SCREEN_PRIVATE_DATA	*PrivateData
+  )
+{
+  AC01_ROOT_COMPLEX *RootComplex = GetRootComplex(RCIndex);
+  return RootComplex->Pcie[0].MaxGen;
+}
+
+VOID *
+CreatePCIeGenSpeedOptions(
+  AC01_ROOT_COMPLEX *RootComplex
+  )
+{
+  EFI_STRING_ID  StringId;
+  VOID           *OptionsOpCodeHandle;
+
+  OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (OptionsOpCodeHandle != NULL);
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN1);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed1
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN2);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed2
+    );
+    
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN3);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed3
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN4);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed4
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN_NONE);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    PCIeSpeed0
+    );
+
+ return OptionsOpCodeHandle;
+}
+//<<ADLINK-PX20220627_01>//
 
 VOID *
 CreateDevMapOptions (
@@ -798,6 +877,22 @@ PcieRCScreenSetup (
       );
   }
 
+//><ADLINK-PX20220627_01>//
+  OptionsOpCodeHandle = CreatePCIeGenSpeedOptions (RootComplex);
+      
+  HiiCreateOneOfOpCode (
+    StartOpCodeHandle,
+    0x8005 +  MAX_EDITABLE_ELEMENTS * RCIndex,
+    VARSTORE_ID,
+    PCIE_SPEED_OFFSET+sizeof(UINT8) * RCIndex,
+    STRING_TOKEN (STR_PCIE_GEN_SPEED),
+    STRING_TOKEN (STR_PCIE_GEN_SPEED_HELP),
+    QuestionFlags,
+    EFI_IFR_NUMERIC_SIZE_1,
+    OptionsOpCodeHandle,
+    NULL
+    );
+//<<ADLINK-PX20220627_01>//
   HiiUpdateForm (
     PrivateData->HiiHandle,     // HII handle
     &gPcieFormSetGuid,          // Formset GUID
@@ -1207,6 +1302,9 @@ RootComplexDriverEntry (
       VarStoreConfig->RCBifurcationHigh[RCIndex] = RootComplex->DefaultDevMapHigh;
       VarStoreConfig->RCStatus[RCIndex] = RootComplex->Active;
       IsUpdated = TRUE;
+//><ADLINK-PX20220627_01>//
+      VarStoreConfig->PCIeMaxGenSpeed[RCIndex] = RootComplex->Pcie[0].MaxGen ;
+//<<ADLINK-PX20220627_01>//
     }
   }
 
