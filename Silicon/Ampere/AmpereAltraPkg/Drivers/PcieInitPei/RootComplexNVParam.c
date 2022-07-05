@@ -482,11 +482,17 @@ GetMaxSpeedGen (
   )
 {
   UINT8 MaxSpeedGen[MaxPcieControllerOfRootComplexA] = { LINK_SPEED_GEN4, LINK_SPEED_GEN4, LINK_SPEED_GEN4, LINK_SPEED_GEN4 };         // Bifurcation 0: RootComplexTypeA x16 / RootComplexTypeB x8
+//><ADLINK-PX20220705_01>//
+  UINT8 AspmLevel[MaxPcieControllerOfRootComplexA] = { NO_ASPM_SUPPORTED, NO_ASPM_SUPPORTED, NO_ASPM_SUPPORTED, NO_ASPM_SUPPORTED };
+//<<ADLINK-PX20220705_01>//
   UINT8 ErrataSpeedDevMap3[MaxPcieControllerOfRootComplexA] = { LINK_SPEED_GEN4, LINK_SPEED_GEN4, LINK_SPEED_GEN1, LINK_SPEED_GEN1 };  // Bifurcation 2: x8 x4 x4 (PCIE_ERRATA_SPEED1)
   UINT8 ErrataSpeedDevMap4[MaxPcieControllerOfRootComplexA] = { LINK_SPEED_GEN1, LINK_SPEED_GEN1, LINK_SPEED_GEN1, LINK_SPEED_GEN1 };  // Bifurcation 3: x4 x4 x4 x4 (PCIE_ERRATA_SPEED1)
   UINT8 ErrataSpeedRcb[MaxPcieControllerOfRootComplexA] = { LINK_SPEED_GEN1, LINK_SPEED_GEN1, LINK_SPEED_GEN1, LINK_SPEED_GEN1 };      // RootComplexTypeB PCIE_ERRATA_SPEED1
   UINT8 Idx, Controller;
   UINT8 *MaxGen;
+//><ADLINK-PX20220705_01>//
+  UINT8 *Aspm;
+//<<ADLINK-PX20220705_01>//
 //><ADLINK-PX20220627_01>//
   EFI_STATUS                           Status;
   UINTN                                DataSize;
@@ -562,8 +568,11 @@ GetMaxSpeedGen (
   } else {
     Controller = RootComplex->MaxPcieController;
   }
+//><ADLINK-PX20220705_01>//
+  Aspm = AspmLevel;
+//<<ADLINK-PX20220705_01>//
   for (Idx = 0; Idx < Controller; Idx++) {
-  //><ADLINK-PX20220627_01>//
+//><ADLINK-PX20220627_01>//
     if (
     (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN1) ||  		
     (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN2) ||
@@ -573,8 +582,20 @@ GetMaxSpeedGen (
       MaxGen [Idx] = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] : LINK_SPEED_GEN3;
     else
       MaxGen [Idx] = LINK_SPEED_GEN3;  
-  //<<ADLINK-PX20220627_01>//
+//<<ADLINK-PX20220627_01>//
     RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? MaxGen[Idx] : LINK_SPEED_NONE;
+//><ADLINK-PX20220705_01>//
+    if (
+    (RootComplexConfig.PCIeAspm[RootComplex->ID] == NO_ASPM_SUPPORTED) ||  		
+    (RootComplexConfig.PCIeAspm[RootComplex->ID] == L0S_SUPPORTED) ||
+    (RootComplexConfig.PCIeAspm[RootComplex->ID] == L1_SUPPORTED) ||  		  		  
+    (RootComplexConfig.PCIeAspm[RootComplex->ID] == L0S_L1_SUPPORTED)  		  
+    )
+      Aspm [Idx] = ConfigFound ? RootComplexConfig.PCIeAspm[RootComplex->ID] : NO_ASPM_SUPPORTED;
+    else
+      Aspm [Idx] = NO_ASPM_SUPPORTED;  
+    RootComplex->Pcie[Idx].Aspm = RootComplex->Pcie[Idx].Active ? Aspm[Idx] : NO_ASPM_SUPPORTED;
+//<<ADLINK-PX20220705_01>//
   }
 
   if (RootComplex->Type == RootComplexTypeB) {
@@ -592,6 +613,19 @@ GetMaxSpeedGen (
 //<<ADLINK-PX20220627_01>//
       RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ?
                                       MaxGen[Idx - MaxPcieControllerOfRootComplexA] : LINK_SPEED_NONE;
+//><ADLINK-PX20220705_01>//
+      if (
+        (RootComplexConfig.PCIeAspm[RootComplex->ID] == NO_ASPM_SUPPORTED) ||  		
+        (RootComplexConfig.PCIeAspm[RootComplex->ID] == L0S_SUPPORTED) ||
+        (RootComplexConfig.PCIeAspm[RootComplex->ID] == L1_SUPPORTED) ||  		  		  
+        (RootComplexConfig.PCIeAspm[RootComplex->ID] == L0S_L1_SUPPORTED)  		  
+        )
+      	Aspm[Idx - MaxPcieControllerOfRootComplexA] = ConfigFound ? RootComplexConfig.PCIeAspm[RootComplex->ID] : NO_ASPM_SUPPORTED;
+      else 
+	      Aspm[Idx] = NO_ASPM_SUPPORTED;
+      RootComplex->Pcie[Idx].Aspm = RootComplex->Pcie[Idx].Active ?
+                                      Aspm[Idx - MaxPcieControllerOfRootComplexA] : NO_ASPM_SUPPORTED;
+//<<ADLINK-PX20220705_01>//
     }
   }
 }

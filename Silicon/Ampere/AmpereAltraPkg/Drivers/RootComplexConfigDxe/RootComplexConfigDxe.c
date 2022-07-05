@@ -488,6 +488,11 @@ DriverCallback (
       Value->u8 = PcieRCGetMaxGen((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData);
       break;
 //<<ADLINK-PX20220627_01>//
+//><ADLINK-PX20220705_01>//
+    case 4:
+      Value->u8 = PcieRCGetAspm((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData);
+      break;
+//<<ADLINK-PX20220705_01>//
     }
     break;
 
@@ -623,6 +628,68 @@ CreatePCIeGenSpeedOptions(
  return OptionsOpCodeHandle;
 }
 //<<ADLINK-PX20220627_01>//
+
+//><ADLINK-PX20220705_01>//
+UINT8
+PcieRCGetAspm (
+  IN UINTN			RCIndex,
+  IN SCREEN_PRIVATE_DATA	*PrivateData
+  )
+{
+  AC01_ROOT_COMPLEX *RootComplex = GetRootComplex(RCIndex);
+  return RootComplex->Pcie[0].Aspm;
+}
+
+VOID *
+CreatePCIeAspmOptions(
+  AC01_ROOT_COMPLEX *RootComplex
+  )
+{
+  EFI_STRING_ID  StringId;
+  VOID           *OptionsOpCodeHandle;
+
+  OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (OptionsOpCodeHandle != NULL);
+
+  StringId = STRING_TOKEN (STR_PCIE_ASPM_NO_ASPM);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    NO_ASPM_SUPPORTED
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_ASPM_L0S);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    L0S_SUPPORTED
+    );
+    
+  StringId = STRING_TOKEN (STR_PCIE_ASPM_L1);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    L1_SUPPORTED
+    );
+
+  StringId = STRING_TOKEN (STR_PCIE_ASPM_L0S_L1);
+  HiiCreateOneOfOptionOpCode (
+    OptionsOpCodeHandle,
+    StringId,
+    0,
+    EFI_IFR_NUMERIC_SIZE_1,
+    L0S_L1_SUPPORTED
+    );
+
+ return OptionsOpCodeHandle;
+}
+//<<ADLINK-PX20220705_01>//
 
 VOID *
 CreateDevMapOptions (
@@ -893,6 +960,22 @@ PcieRCScreenSetup (
     NULL
     );
 //<<ADLINK-PX20220627_01>//
+//><ADLINK-PX20220705_01>//
+  OptionsOpCodeHandle = CreatePCIeAspmOptions (RootComplex);
+      
+  HiiCreateOneOfOpCode (
+    StartOpCodeHandle,
+    0x8005 +  MAX_EDITABLE_ELEMENTS * RCIndex,
+    VARSTORE_ID,
+    PCIE_ASPM_OFFSET+sizeof(UINT8) * RCIndex,
+    STRING_TOKEN (STR_PCIE_ASPM),
+    STRING_TOKEN (STR_PCIE_ASPM_HELP),
+    QuestionFlags,
+    EFI_IFR_NUMERIC_SIZE_1,
+    OptionsOpCodeHandle,
+    NULL
+    );
+//<<ADLINK-PX20220705_01>//
   HiiUpdateForm (
     PrivateData->HiiHandle,     // HII handle
     &gPcieFormSetGuid,          // Formset GUID
@@ -1305,6 +1388,9 @@ RootComplexDriverEntry (
 //><ADLINK-PX20220627_01>//
       VarStoreConfig->PCIeMaxGenSpeed[RCIndex] = RootComplex->Pcie[0].MaxGen ;
 //<<ADLINK-PX20220627_01>//
+//><ADLINK-PX20220705_01>//
+      VarStoreConfig->PCIeAspm[RCIndex] = RootComplex->Pcie[0].Aspm ;
+//<<ADLINK-PX20220705_01>//
     }
   }
 

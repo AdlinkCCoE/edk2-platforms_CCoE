@@ -32,6 +32,10 @@
 #string STR_PCIE_GEN_SPEED              #language en-US "PCIe Speed"
 #string STR_PCIE_GEN_SPEED_HELP         #language en-US "Set PCIe Speed"
 //<<ADLINK-PX20220627_01>//
+//><ADLINK-PX20220705_01>//
+#string STR_PCIE_ASPM                   #language en-US "ASPM"
+#string STR_PCIE_ASPM_HELP              #language en-US "Set ASPM level"
+//<<ADLINK-PX20220705_01>//
 /////
 
 #string STR_PCIE_RC0_FORM               #language en-US "Root Complex 0 Configuration"
@@ -99,6 +103,12 @@
 #string STR_PCIE_SPEED_GEN4             #language en-US "Gen4"
 #string STR_PCIE_SPEED_GEN_NONE         #language en-US "Gen None"
 //<<ADLINK-PX20220627_01>//
+//><ADLINK-PX20220705_01>//
+#string STR_PCIE_ASPM_NO_ASPM           #language en-US "NO ASPM"
+#string STR_PCIE_ASPM_L0S               #language en-US "L0S"
+#string STR_PCIE_ASPM_L1                #language en-US "L1"
+#string STR_PCIE_ASPM_L0S_L1            #language en-US "L0S/L1"
+//<<ADLINK-PX20220705_01>//
 
 #string STR_PCIE_SOCKET                 #language en-US "Socket"
 #string STR_PCIE_SOCKET_HELP            #language en-US "Socket 0 - Master; Socket 1 - Slave"

@@ -121,6 +121,9 @@ BuildRootComplexData (
       //><ADLINK-PX20220627_01>//
       RootComplex->Pcie[PcieIndex].MaxGen = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[RCIndex] : LINK_SPEED_GEN3;
       //<<ADLINK-PX20220627_01>//
+      //><ADLINK-PX20220705_01>//
+      RootComplex->Pcie[PcieIndex].Aspm = ConfigFound ? RootComplexConfig.PCIeAspm [RCIndex] : NO_ASPM_SUPPORTED;
+      //<<ADLINK-PX20220705_01>//
       RootComplex->Pcie[PcieIndex].CsrBase = RootComplex->CsrBase + PCIE0_CSR_OFFSET + PcieIndex * PCIE_CSR_SIZE;
       RootComplex->Pcie[PcieIndex].SnpsRamBase = RootComplex->Pcie[PcieIndex].CsrBase + SNPSRAM_OFFSET;
       RootComplex->Pcie[PcieIndex].DevNum = PcieIndex + 1;

@@ -54,6 +54,15 @@ typedef enum {
  MaxPCIeSpdeed = PCIeSpeed4
 } PCIE_GEN_SPEED;
 //<<ADLINK-PX20220627_01>//
+//><ADLINK-PX20220705_01>//
+typedef enum {
+  NO_ASPM_SUPPORTED,
+  L0S_SUPPORTED,
+  L1_SUPPORTED,
+  L0S_L1_SUPPORTED
+} PCIE_ASPM_LEVEL;
+//<<ADLINK-PX20220705_01>//
+
 
 //
 // PCIe controller index
@@ -115,6 +124,9 @@ typedef struct {
   BOOLEAN           Active;                // Active? Used in bi-furcation mode
   BOOLEAN           LinkUp;                // PHY and PCIE linkup
   BOOLEAN           HotPlug;               // Hotplug support
+//><ADLINK-PX20220704_01>//
+  UINT8             Aspm;                  // ASPM: NO_ASPM_SUPPORTED 0x0/L0S_SUPPORTED 0x1/L1_SUPPORTED 0x2/L0S_L1_SUPPORTED 0x3
+//<<ADLINK-PX20220704_01>//
 } AC01_PCIE_CONTROLLER;
 
 //
