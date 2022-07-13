@@ -472,7 +472,7 @@ ProgramLinkCapabilities (
   // Enable ASPM Capability
   //><ADLINK-PX20220705_01>//
   Val = CAP_ACTIVE_STATE_LINK_PM_SUPPORT_SET (Val, RootComplex->Pcie[PcieIndex].Aspm);
-  DEBUG ((DEBUG_ERROR, "%a: Failed to initialize the PCIe PHY\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a: Set the ASPM capability of RootComplex\n", __FUNCTION__));
   DEBUG ((DEBUG_INFO, "%a: TargetAddress = %08x\n", __FUNCTION__, TargetAddress));
   DEBUG ((DEBUG_INFO, "%a: Val = %08x\n", __FUNCTION__, Val));
   //<<ADLINK-PX20220705_01>//
