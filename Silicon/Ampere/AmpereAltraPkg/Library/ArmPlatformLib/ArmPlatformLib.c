@@ -83,6 +83,24 @@ ArmPlatformInitialize (
                );
   }
 
+  if (FixedPcdGet64 (PcdSerial3RegisterBase) != 0) {
+    BaudRate = FixedPcdGet64 (PcdSerial3UartBaudRate);
+    ReceiveFifoDepth = FixedPcdGet32 (PcdUartDefaultReceiveFifoDepth);
+    Parity = (EFI_PARITY_TYPE)FixedPcdGet8 (PcdUartDefaultParity);
+    DataBits = FixedPcdGet8 (PcdUartDefaultDataBits);
+    StopBits = (EFI_STOP_BITS_TYPE)FixedPcdGet8 (PcdUartDefaultStopBits);
+
+    Status |= PL011UartInitializePort (
+               (UINTN)FixedPcdGet64 (PcdSerial3RegisterBase),
+               FixedPcdGet32 (PL011UartClkInHz),
+               &BaudRate,
+               &ReceiveFifoDepth,
+               &Parity,
+               &DataBits,
+               &StopBits
+               );
+  }
+
   return Status;
 }
 
