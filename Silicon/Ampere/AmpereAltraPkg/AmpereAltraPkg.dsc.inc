@@ -463,7 +463,7 @@
   gAmpereTokenSpaceGuid.PcdSerial3RegisterBase|0x100002630000
   gAmpereTokenSpaceGuid.PcdSerial3UartBaudRate|115200
 
-#
+  #
   # We want to use the Shell Libraries but don't want it to initialise
   # automatically. We initialise the libraries when the command is called by the
   # Shell.
