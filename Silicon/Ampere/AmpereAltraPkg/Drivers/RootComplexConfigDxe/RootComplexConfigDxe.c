@@ -961,20 +961,20 @@ PcieRCScreenSetup (
     );
 //<<ADLINK-PX20220627_01>//
 //><ADLINK-PX20220705_01>//
-  OptionsOpCodeHandle = CreatePCIeAspmOptions (RootComplex);
+  // OptionsOpCodeHandle = CreatePCIeAspmOptions (RootComplex);
       
-  HiiCreateOneOfOpCode (
-    StartOpCodeHandle,
-    0x8005 +  MAX_EDITABLE_ELEMENTS * RCIndex,
-    VARSTORE_ID,
-    PCIE_ASPM_OFFSET+sizeof(UINT8) * RCIndex,
-    STRING_TOKEN (STR_PCIE_ASPM),
-    STRING_TOKEN (STR_PCIE_ASPM_HELP),
-    QuestionFlags,
-    EFI_IFR_NUMERIC_SIZE_1,
-    OptionsOpCodeHandle,
-    NULL
-    );
+  // HiiCreateOneOfOpCode (
+  //   StartOpCodeHandle,
+  //   0x8005 +  MAX_EDITABLE_ELEMENTS * RCIndex,
+  //   VARSTORE_ID,
+  //   PCIE_ASPM_OFFSET+sizeof(UINT8) * RCIndex,
+  //   STRING_TOKEN (STR_PCIE_ASPM),
+  //   STRING_TOKEN (STR_PCIE_ASPM_HELP),
+  //   QuestionFlags,
+  //   EFI_IFR_NUMERIC_SIZE_1,
+  //   OptionsOpCodeHandle,
+  //   NULL
+  //   );
 //<<ADLINK-PX20220705_01>//
   HiiUpdateForm (
     PrivateData->HiiHandle,     // HII handle
