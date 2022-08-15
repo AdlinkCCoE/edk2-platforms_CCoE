@@ -36,7 +36,10 @@
   #><ADLINK-PX20220627_01>#
   AmpereCpuLib
   #<<ADLINK-PX20220627_01>#
-
+  #><ADLINK-PX20220815_01>#
+  GpioLib
+  #<<ADLINK-PX20220815_01>#
+  
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
