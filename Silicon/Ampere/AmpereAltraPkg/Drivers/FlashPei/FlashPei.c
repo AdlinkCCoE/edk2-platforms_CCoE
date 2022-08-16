@@ -19,7 +19,12 @@
 //><ADLINK-PX20220627_01>//
 #include <Library/AmpereCpuLib.h>
 //<<ADLINK-PX20220627_01>//
+//><ADLINK-PX20220815_01>//
 #include <Library/GpioLib.h>
+
+#define BIOS_RECOVER_GPIO 4
+#define ACTIVE_HIGH 1
+//<<ADLINK-PX20220815_01>//
 
 //><ADLINK-PX20220627_01>//
 #define UUID_SIZE     PcdGetSize (PcdPlatformConfigUuid)+sizeof(BOOLEAN)
@@ -112,10 +117,10 @@ FlashPeiEntryPoint (
 
 //><ADLINK-PX20220815_01>//
   if ((CompareMem ((VOID *)StoredUuid, (VOID *)BuildUuid, UUID_SIZE) != 0) || 
-      (GpioReadBit(4)==1))
+      (GpioReadBit(BIOS_RECOVER_GPIO)==ACTIVE_HIGH))
   {
     DEBUG ((DEBUG_INFO, "BUILD UUID Changed, Update Storage with NVRAM FV\n"));
-    DEBUG ((DEBUG_INFO, "%a%, CPU_BIOS_RECOVER_GPIOAC6 = %x\n", __FUNCTION__,   GpioReadBit(4)));
+    DEBUG ((DEBUG_INFO, "%a%, CPU_BIOS_RECOVER_GPIOAC6 = %x\n", __FUNCTION__,   GpioReadBit(BIOS_RECOVER_GPIO)));
 //<<ADLINK-PX20220815_01>//
 
     Status = FlashEraseCommand (FWNvRamStartOffset, NvRamSize * 2);
