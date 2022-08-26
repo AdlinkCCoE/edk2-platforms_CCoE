@@ -98,6 +98,12 @@
   gAmpereTokenSpaceGuid.PcdIpmiSsifResponseRetryCount|250|UINT8|0x00000E
   gAmpereTokenSpaceGuid.PcdIpmiSsifResponseRetryInterval|20000|UINT32|0x0000000F # 20ms
 
+  #
+  # UART 3
+  #
+  gAmpereTokenSpaceGuid.PcdSerial3RegisterBase|0|UINT64|0x00000011
+  gAmpereTokenSpaceGuid.PcdSerial3UartBaudRate|0|UINT64|0x00020012
+
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
   #
   # Firmware Volume Pcds
