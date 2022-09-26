@@ -396,6 +396,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
 
   #
+  # PL011 - Serial 3 UART
+  # Ampere Altra UART3
+  #
+  gAmpereTokenSpaceGuid.PcdSerial3RegisterBase|0x100002630000
+  gAmpereTokenSpaceGuid.PcdSerial3UartBaudRate|115200
+
+  #
   # ARM SBSA Watchdog
   #
   gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0x1000027c0000

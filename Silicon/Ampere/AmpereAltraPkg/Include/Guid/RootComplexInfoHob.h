@@ -44,6 +44,17 @@ typedef enum {
   MaxDevMapMode = DevMapModeAuto
 } DEV_MAP_MODE;
 
+//><ADLINK-PX20220627_01>//
+typedef enum {
+ PCIeSpeed0 = LINK_SPEED_NONE,
+ PCIeSpeed1 = LINK_SPEED_GEN1,
+ PCIeSpeed2 = LINK_SPEED_GEN2,
+ PCIeSpeed3 = LINK_SPEED_GEN3,
+ PCIeSpeed4 =LINK_SPEED_GEN4,
+ MaxPCIeSpdeed = PCIeSpeed4
+} PCIE_GEN_SPEED;
+//<<ADLINK-PX20220627_01>//
+
 //
 // PCIe controller index
 //

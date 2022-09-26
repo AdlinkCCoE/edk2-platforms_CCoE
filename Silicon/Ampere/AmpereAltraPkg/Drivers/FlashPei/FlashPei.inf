@@ -28,16 +28,19 @@
   BaseMemoryLib
   DebugLib
   FlashLib
-  IpmiCommandLibExt
+  # IpmiCommandLibExt
   MmCommunicationLib
   NVParamLib
   PcdLib
   PeimEntryPoint
   ResetSystemLib
-
-[Ppis]
-  gPeiIpmiPpiGuid              ### CONSUMES
-
+  #><ADLINK-PX20220627_01>#
+  AmpereCpuLib
+  #<<ADLINK-PX20220627_01>#
+  #><ADLINK-PX20220815_01>#
+  GpioLib
+  #<<ADLINK-PX20220815_01>#
+  
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
