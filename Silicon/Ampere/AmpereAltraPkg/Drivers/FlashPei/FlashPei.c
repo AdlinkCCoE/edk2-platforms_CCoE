@@ -12,7 +12,9 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/FlashLib.h>
+//><ADLINK-PX20221005_01>//
 // #include <Library/IpmiCommandLibExt.h>
+//<<ADLINK-PX20221005_01>//
 #include <Library/NVParamLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
@@ -53,7 +55,10 @@ FlashPeiEntryPoint (
   CHAR8                 NullUuid[PcdGetSize (PcdPlatformConfigUuid)];
 //<<ADLINK-PX20220627_01>//
   EFI_STATUS            Status;
+//><ADLINK-PX20221005_01>//
   // IPMI_BOOT_FLAGS_INFO  BootFlags;
+  BOOLEAN               IsAc01;
+//<<ADLINK-PX20221005_01>//
   BOOLEAN               NeedToClearUserConfiguration;
   UINT32                FWNvRamSize;
   UINT32                NvRamSize;
@@ -61,17 +66,14 @@ FlashPeiEntryPoint (
   UINTN                 FWNvRamStartOffset;
   UINTN                 NvRamAddress;
   UINTN                 UefiMiscOffset;
-//><ADLINK-PX20220627_01>//
-  BOOLEAN             IsAc01;
-
-  IsAc01 = IsAc01Processor ();
-  CopyMem ((VOID *)BuildUuid, PcdGetPtr (PcdPlatformConfigUuid), UUID_SIZE);
-  BuildUuid[sizeof (BuildUuid)-sizeof(IsAc01)]=IsAc01;
-//<<ADLINK-PX20220627_01>//
 
   NeedToClearUserConfiguration = FALSE;
 
   CopyMem ((VOID *)BuildUuid, PcdGetPtr (PcdPlatformConfigUuid), UUID_SIZE);
+//><ADLINK-PX20221005_01>//
+  IsAc01 = IsAc01Processor ();
+  BuildUuid[sizeof (BuildUuid)-sizeof(IsAc01)]=IsAc01;
+//<<ADLINK-PX20221005_01>//
 
   NvRamAddress = PcdGet64 (PcdFlashNvStorageVariableBase64);
   NvRamSize = FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
@@ -103,6 +105,7 @@ FlashPeiEntryPoint (
   //
   // Get Boot Flags from BMC to determine if an NVRAM clear request has been made or not.
   //
+//><ADLINK-PX20221005_01>//
   // Status = IpmiGetBootFlags (&BootFlags);
   // if (!EFI_ERROR (Status)) {
   //   if (BootFlags.IsCmosClear) {
@@ -118,6 +121,7 @@ FlashPeiEntryPoint (
   // } else {
   //   DEBUG ((DEBUG_ERROR, "FlashPei: Failed to get Boot Flags via IPMI - %r\n", Status));
   // }
+//<<ADLINK-PX20221005_01>//
 
   //
   // Get the Platform UUID stored in the very first bytes of the UEFI Misc.
@@ -141,15 +145,16 @@ FlashPeiEntryPoint (
   DEBUG ((DEBUG_INFO, "IsAc01 = %x\n", IsAc01));
 //<<ADLINK-PX20220627_01>//
 
-//><ADLINK-PX20220815_01>//
-  if ((CompareMem ((VOID *)StoredUuid, (VOID *)BuildUuid, UUID_SIZE) != 0) || 
-      (GpioReadBit(BIOS_RECOVER_GPIO)==ACTIVE_HIGH))
-  {
+  if ((CompareMem ((VOID *)StoredUuid, (VOID *)BuildUuid, UUID_SIZE)) != 0) {
     DEBUG ((DEBUG_INFO, "BUILD UUID Changed, Update Storage with NVRAM FV\n"));
-    DEBUG ((DEBUG_INFO, "%a%, CPU_BIOS_RECOVER_GPIOAC6 = %x\n", __FUNCTION__,   GpioReadBit(BIOS_RECOVER_GPIO)));
-//<<ADLINK-PX20220815_01>//
     NeedToClearUserConfiguration = TRUE;
   }
+//><ADLINK-PX20221005_01>//
+  if (GpioReadBit(BIOS_RECOVER_GPIO)==ACTIVE_HIGH) {
+    DEBUG ((DEBUG_INFO, "%a%, CPU_BIOS_RECOVER_GPIOAC6 = %x\n", __FUNCTION__,   GpioReadBit(BIOS_RECOVER_GPIO)));
+    NeedToClearUserConfiguration = TRUE;
+  }
+//<<ADLINK-PX20221005_01>//
 
   if (NeedToClearUserConfiguration) {
 
