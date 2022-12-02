@@ -323,6 +323,11 @@ RouteConfig (
     BufferSize = sizeof (ROOT_COMPLEX_CONFIG_VARSTORE_DATA);
     VarStoreConfig = (UINT8 *)&PrivateData->VarStoreConfig;
   }
+  else
+  {
+        return EFI_NOT_FOUND;
+  }
+
   ASSERT (VarStoreConfig != NULL);
 
   //
