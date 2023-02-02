@@ -540,31 +540,20 @@ GetMaxSpeedGen (
     Controller = RootComplex->MaxPcieController;
   }
   for (Idx = 0; Idx < Controller; Idx++) {
-  if (
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN1) ||  		
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN2) ||
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN3) ||  		  		  
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN4)  		  
-  )
-  	MaxGen [Idx] = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] : LINK_SPEED_GEN3;
-  else
-	MaxGen [Idx] = LINK_SPEED_GEN3;  
-    RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? MaxGen[Idx] : LINK_SPEED_NONE;
+	MaxGen [Idx] = RootComplex->Pcie[Idx].MaxGen;  
+    RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_NONE;
   }
 
   if (RootComplex->Type == RootComplexTypeB) {
     for (Idx = MaxPcieControllerOfRootComplexA; Idx < MaxPcieController; Idx++) {
-      if (
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN1) ||  		
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN2) ||
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN3) ||  		  		  
-  (RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] == LINK_SPEED_GEN4)  		  
-  )
-  	MaxGen[Idx - MaxPcieControllerOfRootComplexA] = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[RootComplex->ID] : LINK_SPEED_GEN3;
-      else 
-	      MaxGen[Idx] = LINK_SPEED_GEN3;
-      RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ?
-                                      MaxGen[Idx - MaxPcieControllerOfRootComplexA] : LINK_SPEED_NONE;
+      MaxGen[Idx] = RootComplex->Pcie[Idx].MaxGen;
+      RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_NONE;
+    }
+  }
+  else
+  {
+  	for (Idx = MaxPcieControllerOfRootComplexA; Idx < MaxPcieController; Idx++) {
+       	RootComplex->Pcie[Idx].MaxGen = LINK_SPEED_NONE;
     }
   }
 }

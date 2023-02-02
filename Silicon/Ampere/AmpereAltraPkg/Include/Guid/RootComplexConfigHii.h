@@ -17,7 +17,7 @@
   }
 
 extern EFI_GUID gRootComplexConfigFormSetGuid;
-
+#define AC01_PCIE_MAX_DEV_TOTAL AC01_PCIE_MAX_ROOT_COMPLEX * AC01_PCIE_MAX_RCS_PER_SOCKET
 //
 // NV data structure definition
 //
@@ -25,7 +25,7 @@ typedef struct {
   BOOLEAN RCStatus[AC01_PCIE_MAX_ROOT_COMPLEX];
   UINT8   RCBifurcationLow[AC01_PCIE_MAX_ROOT_COMPLEX];
   UINT8   RCBifurcationHigh[AC01_PCIE_MAX_ROOT_COMPLEX];
-  UINT8   PCIeMaxGenSpeed[AC01_PCIE_MAX_ROOT_COMPLEX];
+  UINT8   PCIeMaxGenSpeed [128];//[AC01_PCIE_MAX_DEV_TOTAL];
   UINT32  SmmuPmu;
 } ROOT_COMPLEX_CONFIG_VARSTORE_DATA;
 

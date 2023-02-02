@@ -118,7 +118,7 @@ BuildRootComplexData (
 
     for (PcieIndex = 0; PcieIndex < RootComplex->MaxPcieController; PcieIndex++) {
       RootComplex->Pcie[PcieIndex].ID = PcieIndex;
-      RootComplex->Pcie[PcieIndex].MaxGen = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[RCIndex] : LINK_SPEED_GEN3;
+      RootComplex->Pcie[PcieIndex].MaxGen = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[(RCIndex*AC01_PCIE_MAX_RCS_PER_SOCKET)+PcieIndex] : LINK_SPEED_GEN3;
       RootComplex->Pcie[PcieIndex].CsrBase = RootComplex->CsrBase + PCIE0_CSR_OFFSET + PcieIndex * PCIE_CSR_SIZE;
       RootComplex->Pcie[PcieIndex].SnpsRamBase = RootComplex->Pcie[PcieIndex].CsrBase + SNPSRAM_OFFSET;
       RootComplex->Pcie[PcieIndex].DevNum = PcieIndex + 1;

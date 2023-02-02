@@ -36,6 +36,8 @@
 #define SMMU_PMU_ID          0x9000
 #define STRONG_ORDERING_ID   0x9001
 
+#define PCIE_DEVICE_SPEED_ID(RootComplex, PcieIndex) ((0x3000 | (RootComplex << 7) | (PcieIndex))
+
 #define NVPARAM_VARSTORE_NAME  L"PcieIfrNVParamData"
 #define NVPARAM_VARSTORE_ID    0x1233
 
