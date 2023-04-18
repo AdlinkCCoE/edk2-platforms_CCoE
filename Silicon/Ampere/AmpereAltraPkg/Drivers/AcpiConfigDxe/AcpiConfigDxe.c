@@ -399,7 +399,7 @@ UpdateTurboModeConfig (
       }
     }
 
-    if (PlatformHob->TurboCapability[1] != 0) {
+    if (GetNumberOfActiveSockets () > 1 && PlatformHob->TurboCapability[1] != 0) {
       Status = MailboxMsgTurboConfig (1, EnableTurbo);
       if (EFI_ERROR (Status)) {
         return Status;
