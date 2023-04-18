@@ -30,6 +30,7 @@
 #include <Protocol/AcpiSystemDescriptionTable.h>
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/HiiConfigRouting.h>
+#include <Library/AmpereCpuLib.h>
 
 #include "AcpiConfigDxe.h"
 
