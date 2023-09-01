@@ -17,7 +17,7 @@
 //
 // I2C bus address that RTC connected to
 //
-#define I2C_RTC_BUS_ADDRESS        1
+#define I2C_RTC_BUS_ADDRESS        2
 
 //
 // I2C RTC bus speed
