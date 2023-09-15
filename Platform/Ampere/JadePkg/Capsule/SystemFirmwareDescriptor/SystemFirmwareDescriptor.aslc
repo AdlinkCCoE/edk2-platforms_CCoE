@@ -17,9 +17,9 @@
 #define PACKAGE_VERSION                     0xFFFFFFFF
 #define PACKAGE_VERSION_STRING              L"Unknown"
 
-#define CURRENT_FIRMWARE_VERSION            0x00000001
-#define CURRENT_FIRMWARE_VERSION_STRING     L"0x00000001"
-#define LOWEST_SUPPORTED_FIRMWARE_VERSION   0x00000001
+#define CURRENT_FIRMWARE_VERSION            0x0204640B
+#define CURRENT_FIRMWARE_VERSION_STRING     L"0x0204640B"
+#define LOWEST_SUPPORTED_FIRMWARE_VERSION   0x02046400
 
 #define IMAGE_ID                            SIGNATURE_64('J', 'A', 'D', 'E', '_', 'F', 'W', ' ')
 #define IMAGE_ID_STRING                     L"Jade System Firmware"
