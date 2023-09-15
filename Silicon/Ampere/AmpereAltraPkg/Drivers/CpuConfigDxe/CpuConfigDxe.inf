@@ -44,6 +44,7 @@
   UefiDriverEntryPoint
   UefiLib
   UefiRuntimeServicesTableLib
+  AmpereCpuLib
 
 [Protocols]
   gEfiHiiConfigRoutingProtocolGuid             ## CONSUMES

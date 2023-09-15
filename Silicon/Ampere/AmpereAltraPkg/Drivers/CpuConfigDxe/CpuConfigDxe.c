@@ -73,6 +73,8 @@ CpuNvParamGet (
 {
   EFI_STATUS Status;
   UINT32     Value;
+  UINT32     CPMcount;
+  INTN       i;
 
   ASSERT (Configuration != NULL);
 
@@ -88,6 +90,18 @@ CpuNvParamGet (
     Configuration->CpuSubNumaMode = Value;
   }
 
+  CPMcount = GetNumberOfConfiguredCPMs(0);
+
+  if (CPMcount == 0){
+    for (i=0; i<16; i++){
+      Configuration->CPMs[i] = 1;
+    }
+  }
+  else {
+    for (i=0; i<CPMcount; i++){
+      Configuration->CPMs[i] = 1;
+    }
+  }
   return EFI_SUCCESS;
 }
 
@@ -99,6 +113,8 @@ CpuNvParamSet (
 {
   EFI_STATUS Status;
   UINT32     Value;
+  UINT32     CPMcount=0;
+  INTN       i;
 
   ASSERT (Configuration != NULL);
 
@@ -122,6 +138,17 @@ CpuNvParamSet (
       return Status;
     }
   }
+
+  for (i=0; i<16; i++){
+    if (Configuration->CPMs[i] == 1){
+      CPMcount++;
+    }
+    else{
+      break;
+    }
+  }
+
+  SetNumberOfConfiguredCPMs(0, CPMcount);
 
   return EFI_SUCCESS;
 }

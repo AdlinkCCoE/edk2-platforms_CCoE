@@ -12,6 +12,7 @@
 #pragma pack(1)
 typedef struct {
   UINT32 CpuSubNumaMode;
+  UINT8 CPMs[16];
 } CPU_VARSTORE_DATA;
 
 #pragma pack()
