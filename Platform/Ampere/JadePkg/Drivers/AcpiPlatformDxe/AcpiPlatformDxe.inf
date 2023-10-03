@@ -75,6 +75,7 @@
 [Guids]
   gArmMpCoreInfoGuid
   gEfiAcpiTableGuid
+  gCpuConfigFormSetGuid
   gEfiEventReadyToBootGuid
   gAcpiConfigFormSetGuid
   gPlatformInfoHobGuid
