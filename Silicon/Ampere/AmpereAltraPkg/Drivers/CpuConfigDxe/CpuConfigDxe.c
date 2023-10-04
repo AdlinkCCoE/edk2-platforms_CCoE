@@ -38,6 +38,8 @@
 #define NEAR_ATOMIC_DISABLE_DEFAULT  0x00 /* Enable Near Atomic */
 #define CPU_SLC_REPLACE_POLICY       0x00 /* eLRU */
 
+CHAR16 CpuVarstoreDataName[] = L"CpuConfigNVData";
+
 EFI_HANDLE              mDriverHandle = NULL;
 CPU_CONFIG_PRIVATE_DATA *mPrivateData = NULL;
 
@@ -71,6 +73,9 @@ CpuNvParamGet (
 {
   EFI_STATUS Status;
   UINT32     Value;
+  UINT32     CPMcount;
+  UINT16     MaxCPM = 16;
+  INTN       i;
 
   ASSERT (Configuration != NULL);
 
@@ -86,6 +91,18 @@ CpuNvParamGet (
     Configuration->CpuSubNumaMode = Value;
   }
 
+  CPMcount = GetNumberOfConfiguredCPMs(0);
+
+  if (CPMcount == 0){
+    for (i=0; i<MaxCPM; i++){
+      Configuration->CPMs[i] = 1;
+    }
+  }
+  else {
+    for (i=0; i<CPMcount; i++){
+      Configuration->CPMs[i] = 1;
+    }
+  }
   return EFI_SUCCESS;
 }
 
@@ -97,6 +114,9 @@ CpuNvParamSet (
 {
   EFI_STATUS Status;
   UINT32     Value;
+  UINT32     CPMcount = 0;
+  UINT16     MaxCPM = 16;
+  INTN       i;
 
   ASSERT (Configuration != NULL);
 
@@ -120,6 +140,17 @@ CpuNvParamSet (
       return Status;
     }
   }
+
+  for (i=0; i<MaxCPM; i++){
+    if (Configuration->CPMs[i] == 1){
+      CPMcount++;
+    }
+    else{
+      break;
+    }
+  }
+
+  SetNumberOfConfiguredCPMs(0, CPMcount);
 
   return EFI_SUCCESS;
 }
