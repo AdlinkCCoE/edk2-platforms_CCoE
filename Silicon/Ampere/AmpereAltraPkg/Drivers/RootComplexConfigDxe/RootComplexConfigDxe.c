@@ -619,15 +619,6 @@ CreatePcieDeviceGenSpeedOptions(
     PCIeSpeed4
     );
 
-  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN_NONE);
-  HiiCreateOneOfOptionOpCode (
-    OptionsOpCodeHandle,
-    StringId,
-    0,
-    EFI_IFR_NUMERIC_SIZE_1,
-    PCIeSpeed0
-    );
-
  return OptionsOpCodeHandle;
 }
 
@@ -679,14 +670,6 @@ CreatePCIeGenSpeedOptions(
     PCIeSpeed4
     );
 
-  StringId = STRING_TOKEN (STR_PCIE_SPEED_GEN_NONE);
-  HiiCreateOneOfOptionOpCode (
-    OptionsOpCodeHandle,
-    StringId,
-    0,
-    EFI_IFR_NUMERIC_SIZE_1,
-    PCIeSpeed0
-    );
 
  return OptionsOpCodeHandle;
 }
@@ -935,6 +918,12 @@ PcieRCScreenSetup (
 
   for (UINT8 PcieIndex=0; PcieIndex < AC01_PCIE_MAX_RCS_PER_SOCKET; PcieIndex++)
   {
+  	  QuestionFlagsSubItem = QuestionFlags;
+  	  
+  	  if (RootComplex->Pcie[PcieIndex].Active == 0)
+  	  {
+            QuestionFlagsSubItem |= EFI_IFR_FLAG_READ_ONLY;
+	  }
 	  //
 	  // Create Option Opcode to display speed for RootComplex
 	  //
@@ -954,7 +943,7 @@ PcieRCScreenSetup (
 	    PCIE_SPEED_OFFSET+PcieIndex + (sizeof(UINT8) * RCIndex * AC01_PCIE_MAX_RCS_PER_SOCKET),
 	    StrId,//STRING_TOKEN (STR_PCIE_GEN_SPEED),
 	    STRING_TOKEN (STR_PCIE_GEN_SPEED_HELP),
-	    QuestionFlags,
+	    QuestionFlagsSubItem,
 	    EFI_IFR_NUMERIC_SIZE_1,
 	    OptionsOpCodeHandle,
 	    NULL
@@ -1368,9 +1357,11 @@ RootComplexDriverEntry (
       VarStoreConfig->RCBifurcationLow[RCIndex] = RootComplex->DevMapLow;
       VarStoreConfig->RCBifurcationHigh[RCIndex] = RootComplex->DevMapHigh;
       VarStoreConfig->RCStatus[RCIndex] = RootComplex->Active;
-      IsUpdated = TRUE;
+      
       for (UINT8 PcieIndex = 0; PcieIndex < AC01_PCIE_MAX_RCS_PER_SOCKET; PcieIndex++)
       	VarStoreConfig->PCIeMaxGenSpeed[(RCIndex*AC01_PCIE_MAX_RCS_PER_SOCKET)+PcieIndex] = RootComplex->Pcie[PcieIndex].MaxGen ;
+
+      IsUpdated = TRUE;
     }
   }
 

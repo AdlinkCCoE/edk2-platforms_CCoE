@@ -251,14 +251,12 @@ GetLaneAllocation (
     case 3:
     case 4:
       RootComplex->Pcie[RPIndex].MaxWidth = 1 << Width;
-      //RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_GEN3;
       RootComplex->Pcie[RPIndex].Active = TRUE;
       break;
 
     case 0:
     default:
       RootComplex->Pcie[RPIndex].MaxWidth = LINK_WIDTH_NONE;
-      RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_NONE;
       RootComplex->Pcie[RPIndex].Active = FALSE;
       break;
     }
@@ -279,14 +277,12 @@ GetLaneAllocation (
       case 3:
       case 4:
         RootComplex->Pcie[RPIndex].MaxWidth = 1 << Width;
-        //RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_GEN3;
         RootComplex->Pcie[RPIndex].Active = TRUE;
         break;
 
       case 0:
       default:
         RootComplex->Pcie[RPIndex].MaxWidth = LINK_WIDTH_NONE;
-        RootComplex->Pcie[RPIndex].MaxGen = LINK_SPEED_NONE;
         RootComplex->Pcie[RPIndex].Active = FALSE;
         break;
       }
@@ -541,19 +537,19 @@ GetMaxSpeedGen (
   }
   for (Idx = 0; Idx < Controller; Idx++) {
 	MaxGen [Idx] = RootComplex->Pcie[Idx].MaxGen;  
-    RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_NONE;
+    RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_GEN3;
   }
 
   if (RootComplex->Type == RootComplexTypeB) {
     for (Idx = MaxPcieControllerOfRootComplexA; Idx < MaxPcieController; Idx++) {
       MaxGen[Idx] = RootComplex->Pcie[Idx].MaxGen;
-      RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_NONE;
+      RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_GEN3;
     }
   }
   else
   {
   	for (Idx = MaxPcieControllerOfRootComplexA; Idx < MaxPcieController; Idx++) {
-       	RootComplex->Pcie[Idx].MaxGen = LINK_SPEED_NONE;
+       	RootComplex->Pcie[Idx].MaxGen = LINK_SPEED_GEN3;
     }
   }
 }
