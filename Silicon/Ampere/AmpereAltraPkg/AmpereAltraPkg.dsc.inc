@@ -97,6 +97,7 @@
   SecVarLib|Silicon/Ampere/AmpereAltraPkg/Library/SecVarLib/SecVarLib.inf
   SmbusHcCommonLib|Silicon/Ampere/AmpereAltraPkg/Library/SmbusHcCommonLib/SmbusHcCommonLib.inf
   OemMiscLib|Silicon/Ampere/AmpereAltraPkg/Library/OemMiscLib/OemMiscLib.inf
+  IpmiBlobsTransferLib|Silicon/Ampere/AmpereSiliconPkg/Library/IpmiBlobsTransferLib/IpmiBlobsTransferLib.inf
 
   #
   # ARM PL011 UART Driver
@@ -144,6 +145,7 @@
   AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
+  PlatformPKProtectionLib|SecurityPkg/Library/PlatformPKProtectionLibVarPolicy/PlatformPKProtectionLibVarPolicy.inf
 
   #
   # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
@@ -332,10 +334,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
 [PcdsFixedAtBuild.common]
-!ifdef $(FIRMWARE_VER)
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
-!endif
-
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
@@ -541,6 +539,7 @@
   # SMBIOS PCDs
   #
   gArmTokenSpaceGuid.PcdProcessorManufacturer|L"Ampere(R)"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor|L"Ampere(R)"
   gArmTokenSpaceGuid.PcdProcessorAssetTag|L"Not Set"
 
 [PcdsDynamicHii.common.DEFAULT]
