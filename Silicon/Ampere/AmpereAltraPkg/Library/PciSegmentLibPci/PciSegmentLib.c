@@ -54,9 +54,36 @@
 **/
 #define PCI_SEGMENT_TO_PCI_ADDRESS(A) ((UINTN)(UINT32)A)
 
+//><ADLINK-MS20233010>//
 /**
-  Get the MCFG Base address from the segment number.
+   Validate a node from config address.
 **/
+STATIC UINT8 PciNodeCheck (UINT64 CfgBase)
+{
+  UINT8 Bus = GET_BUS_NUM (CfgBase);
+
+  CfgBase &= 0xFFFFF0000000; // BDF 00:00.0 RC host base
+
+  for (int i = 1; i <= 8; i++) { // max 8 RC ports per segment
+
+    CfgBase += (1ULL << 15); // BDF 00:i.0 RC port base
+    if (MmioRead32 (CfgBase) == 0xFFFFFFFF) continue; // invalid vid/did
+
+    UINT8 SecBus = MmioRead32 (CfgBase + 0x18) >> 8;
+    if (SecBus == Bus) { // child of RC
+      DEBUG((DEBUG_INFO, "  Node CK: Invalid\n", Bus, GET_DEV_NUM(CfgBase)));
+      return 1;
+    }
+  }
+
+  DEBUG((DEBUG_INFO, "  Node CK: Valid\n", Bus, GET_DEV_NUM(CfgBase)));
+  return 0;
+}
+//><ADLINK-MS20233010>//
+
+ /**
+   Get the MCFG Base address from the segment number.
+ **/
 UINTN
 GetMmcfgBase (
   IN UINT16  SegmentNumber
@@ -540,7 +567,16 @@ PciSegmentRead16 (
       if (HeaderType != 0) {
         PrimaryBus = MmioRead32 (CfgBase + PRIMARY_BUS_NUMBER_REG);
         DEBUG ((DEBUG_INFO, "  Peek RD: PrimaryBus=0x%02X\n", PrimaryBus));
+//><ADLINK-MS20233010>//
+      if (PrimaryBus) { 
+        PrimaryBus = PciNodeCheck (CfgBase);
+        DEBUG ((DEBUG_INFO, "  1Peek RD: PrimaryBus=0x%02X\n", PrimaryBus));
       }
+      else {
+        DEBUG ((DEBUG_INFO, "  1Peek RD: PrimaryBus=0x%02X\n", PrimaryBus));
+      }
+//><ADLINK-MS20233010>//
+   }
 
       if ((HeaderType == 0) || (PrimaryBus != 0)) {
         Value = 0xFFFF;
@@ -973,7 +1009,16 @@ PciSegmentRead32 (
       if (HeaderType != 0) {
         PrimaryBus = MmioRead32 (CfgBase + PRIMARY_BUS_NUMBER_REG);
         DEBUG ((DEBUG_INFO, "  Peek RD: PrimaryBus=0x%02X\n", PrimaryBus));
+//><ADLINK-MS20233010>//		
+      if (PrimaryBus) {
+        PrimaryBus = PciNodeCheck (CfgBase);
+        DEBUG ((DEBUG_INFO, "  1Peek RD: PrimaryBus=0x%02X\n", PrimaryBus));
       }
+      else {
+        DEBUG ((DEBUG_INFO, "  1Peek RD: PrimaryBus=0x%02X\n", PrimaryBus));
+      }
+//><ADLINK-MS20233010>//	  
+    }
 
       if ((HeaderType == 0) || (PrimaryBus != 0)) {
         Value = 0xFFFFFFFF;

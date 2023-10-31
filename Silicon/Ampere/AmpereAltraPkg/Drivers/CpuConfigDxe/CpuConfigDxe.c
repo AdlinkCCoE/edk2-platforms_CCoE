@@ -38,6 +38,10 @@
 #define NEAR_ATOMIC_DISABLE_DEFAULT  0x00 /* Enable Near Atomic */
 #define CPU_SLC_REPLACE_POLICY       0x00 /* eLRU */
 
+//><ADLINK-MS20233010>//
+CHAR16 CpuVarstoreDataName[] = L"CpuConfigNVData";
+//><ADLINK-MS20233010>//
+
 EFI_HANDLE              mDriverHandle = NULL;
 CPU_CONFIG_PRIVATE_DATA *mPrivateData = NULL;
 
@@ -71,6 +75,11 @@ CpuNvParamGet (
 {
   EFI_STATUS Status;
   UINT32     Value;
+//><ADLINK-MS20233010>//
+  UINT32     CPMcount;
+  UINT16     MaxCPM = 16;
+  INTN       i;
+//><ADLINK-MS20233010>//
 
   ASSERT (Configuration != NULL);
 
@@ -86,6 +95,20 @@ CpuNvParamGet (
     Configuration->CpuSubNumaMode = Value;
   }
 
+//><ADLINK-MS20233010>//
+  CPMcount = GetNumberOfConfiguredCPMs(0);
+
+  if (CPMcount == 0){
+    for (i=0; i<MaxCPM; i++){
+      Configuration->CPMs[i] = 1;
+    }
+  }
+  else {
+    for (i=0; i<CPMcount; i++){
+      Configuration->CPMs[i] = 1;
+    }
+  }
+//><ADLINK-MS20233010>//
   return EFI_SUCCESS;
 }
 
@@ -97,6 +120,11 @@ CpuNvParamSet (
 {
   EFI_STATUS Status;
   UINT32     Value;
+//><ADLINK-MS20233010>//
+  UINT32     CPMcount = 0;
+  UINT16     MaxCPM = 16;
+  INTN       i;
+//><ADLINK-MS20233010>//
 
   ASSERT (Configuration != NULL);
 
@@ -120,7 +148,18 @@ CpuNvParamSet (
       return Status;
     }
   }
+//><ADLINK-MS20233010>//
+  for (i=0; i<MaxCPM; i++){
+    if (Configuration->CPMs[i] == 1){
+      CPMcount++;
+    }
+    else{
+      break;
+    }
+  }
 
+  SetNumberOfConfiguredCPMs(0, CPMcount);
+//><ADLINK-MS20233010>//
   return EFI_SUCCESS;
 }
 

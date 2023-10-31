@@ -24,8 +24,9 @@ extern UINT8 RootComplexConfigVfrBin[];
 // create a packagelist (which contains Form packages, String packages, etc).
 //
 extern UINT8 RootComplexConfigDxeStrings[];
-
-#define MAX_EDITABLE_ELEMENTS 3
+//><ADLINK-MS20232710>//
+#define MAX_EDITABLE_ELEMENTS 11
+//><ADLINK-MS20232710>//
 #define RC0_STATUS_OFFSET  \
   OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, RCStatus[0])
 #define RC0_BIFUR_LO_OFFSET  \
@@ -34,7 +35,10 @@ extern UINT8 RootComplexConfigDxeStrings[];
   OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, RCBifurcationHigh[0])
 #define SMMU_PMU_OFFSET  \
   OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, SmmuPmu)
-
+//><ADLINK-MS20232710>//  
+#define PCIE_SPEED_OFFSET \
+  OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, PCIeMaxGenSpeed[0])
+//><ADLINK-MS20232710>//  
 #define STRONG_ORDERING_OFFSET  \
   OFFSET_OF (NVPARAM_ROOT_COMPLEX_CONFIG_VARSTORE_DATA, PcieStrongOrdering)
 
@@ -110,5 +114,13 @@ PcieRCActiveDefaultSetting (
   IN UINTN                    RCIndex,
   IN SCREEN_PRIVATE_DATA      *PrivateData
   );
-
+  
+//><ADLINK-MS20232710>//
+UINT8
+PcieRCGetMaxGen (
+  IN UINTN                    RCIndex,
+  IN SCREEN_PRIVATE_DATA      *PrivateData,
+  IN UINT8                    PcieIndex
+  );
+//><ADLINK-MS20232710>//
 #endif /* BOARD_PCIE_SCREEN_H_ */

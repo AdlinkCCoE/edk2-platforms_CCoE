@@ -17,13 +17,15 @@
 #define PACKAGE_VERSION                     0xFFFFFFFF
 #define PACKAGE_VERSION_STRING              L"Unknown"
 
-#define CURRENT_FIRMWARE_VERSION            0x00000001
-#define CURRENT_FIRMWARE_VERSION_STRING     L"0x00000001"
-#define LOWEST_SUPPORTED_FIRMWARE_VERSION   0x00000001
+//><ADLINK-MS20233010>//
+#define CURRENT_FIRMWARE_VERSION            0x02096400
+#define CURRENT_FIRMWARE_VERSION_STRING     L"0x02096400"
+#define LOWEST_SUPPORTED_FIRMWARE_VERSION   0x02046400
 
-#define IMAGE_ID                            SIGNATURE_64('J', 'A', 'D', 'E', '_', 'F', 'W', ' ')
-#define IMAGE_ID_STRING                     L"Jade System Firmware"
 
+#define IMAGE_ID                            SIGNATURE_64('A', 'A', 'D', 'P', '_', 'F', 'W', ' ')
+#define IMAGE_ID_STRING                     L"Ampere Altra Developer Platform Firmware"
+//><ADLINK-MS20233010>//
 // PcdSystemFmpCapsuleImageTypeIdGuid
 #define IMAGE_TYPE_ID_GUID                  { 0xf08bca31, 0x542e, 0x4cea, { 0x8b, 0x48, 0x8e, 0x54, 0xf9, 0x42, 0x25, 0x94 } }
 

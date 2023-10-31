@@ -118,6 +118,9 @@ BuildRootComplexData (
 
     for (PcieIndex = 0; PcieIndex < RootComplex->MaxPcieController; PcieIndex++) {
       RootComplex->Pcie[PcieIndex].ID = PcieIndex;
+//><ADLINK-MS20232710>//	  
+      RootComplex->Pcie[PcieIndex].MaxGen = ConfigFound ? RootComplexConfig.PCIeMaxGenSpeed[(RCIndex*AC01_PCIE_MAX_RCS_PER_SOCKET)+PcieIndex] : LINK_SPEED_GEN3;
+//><ADLINK-MS20232710>//
       RootComplex->Pcie[PcieIndex].CsrBase = RootComplex->CsrBase + PCIE0_CSR_OFFSET + PcieIndex * PCIE_CSR_SIZE;
       RootComplex->Pcie[PcieIndex].SnpsRamBase = RootComplex->Pcie[PcieIndex].CsrBase + SNPSRAM_OFFSET;
       RootComplex->Pcie[PcieIndex].DevNum = PcieIndex + 1;
@@ -176,7 +179,7 @@ PcieInitEntry (
     DEBUG ((DEBUG_INIT, "Initializing S%d-RC%d...", RootComplex->Socket, RootComplex->ID));
     Status = Ac01PcieCoreSetupRC (RootComplex, FALSE, 0);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Failed\n"));
+      DEBUG ((DEBUG_ERROR, "RootComplex[%d]: Init Failed\n", Index));
       RootComplex->Active = FALSE;
       continue;
     } else {
