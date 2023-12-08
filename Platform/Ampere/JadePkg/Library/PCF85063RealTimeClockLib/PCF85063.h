@@ -17,9 +17,9 @@
 //
 // I2C bus address that RTC connected to
 //
-//><ADLINK-AG20232710>//
-#define I2C_RTC_BUS_ADDRESS        2
-//><ADLINK-AG20232710>//
+//><ADLINK-MS20230812>//
+#define I2C_RTC_BUS_ADDRESS        1
+//><ADLINK-MS20230812>//
 
 //
 // I2C RTC bus speed
