@@ -538,18 +538,21 @@ GetMaxSpeedGen (
   for (Idx = 0; Idx < Controller; Idx++) {
 	MaxGen [Idx] = RootComplex->Pcie[Idx].MaxGen;  
     RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_GEN3;
+    RootComplex->Pcie[Idx].DefaultMaxGen = LINK_SPEED_GEN3;
   }
 
   if (RootComplex->Type == RootComplexTypeB) {
     for (Idx = MaxPcieControllerOfRootComplexA; Idx < MaxPcieController; Idx++) {
       MaxGen[Idx] = RootComplex->Pcie[Idx].MaxGen;
       RootComplex->Pcie[Idx].MaxGen = RootComplex->Pcie[Idx].Active ? RootComplex->Pcie[Idx].MaxGen : LINK_SPEED_GEN3;
+      RootComplex->Pcie[Idx].DefaultMaxGen = LINK_SPEED_GEN3;
     }
   }
   else
   {
   	for (Idx = MaxPcieControllerOfRootComplexA; Idx < MaxPcieController; Idx++) {
        	RootComplex->Pcie[Idx].MaxGen = LINK_SPEED_GEN3;
+        RootComplex->Pcie[Idx].DefaultMaxGen = LINK_SPEED_GEN3;
     }
   }
 }

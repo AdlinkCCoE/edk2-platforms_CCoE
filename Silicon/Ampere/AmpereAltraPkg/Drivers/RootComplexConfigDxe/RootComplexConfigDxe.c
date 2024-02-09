@@ -494,7 +494,7 @@ DriverCallback (
     case 8:
     case 9:
     case 10:
-      Value->u8 = PcieRCGetMaxGen((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData, (QuestionId - 0x8002) % MAX_EDITABLE_ELEMENTS);
+      Value->u8 = PcieRCGetDefaultMaxGen((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData, (QuestionId - 0x8002) % MAX_EDITABLE_CONTROLLER_ELEMENTS);
       break;
     }
     break;
@@ -559,6 +559,19 @@ PcieRCActiveDefaultSetting (
   AC01_ROOT_COMPLEX *RootComplex = GetRootComplex (RCIndex);
 
   return RootComplex->DefaultActive;
+}
+
+UINT8
+PcieRCGetDefaultMaxGen (
+  IN UINTN			RCIndex,
+  IN SCREEN_PRIVATE_DATA	*PrivateData,
+  IN UINT8			PcieIndex
+  )
+{
+
+  AC01_ROOT_COMPLEX *RootComplex = GetRootComplex(RCIndex);
+  
+  return RootComplex->Pcie[PcieIndex].DefaultMaxGen;
 }
 
 UINT8
