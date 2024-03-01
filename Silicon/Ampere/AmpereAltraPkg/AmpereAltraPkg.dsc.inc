@@ -441,8 +441,10 @@
   #
   # PL011 - Serial Terminal
   # Ampere Altra UART0
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x100002600000
+  # 
+  # //><ADLINK-MS20240103>//
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x100002630000
+  # //><ADLINK-MS20240103>//
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|32
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
