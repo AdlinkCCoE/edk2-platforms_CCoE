@@ -53,10 +53,12 @@ formset
       endoneof;
     endif;
  
-//><ADLINK-MS20233010>//
+//><ADLINK-MS20240403>//
+#if 0
     goto ACTIVE_CORE_FORM_ID,
       prompt = STRING_TOKEN(STR_ACTIVE_CORE_COUNT_CONFIG_PROMPT),
       help   = STRING_TOKEN(STR_ACTIVE_CORE_COUNT_CONFIG_PROMPT_HELP);
+
   endform;
 
   form formid = ACTIVE_CORE_FORM_ID,
@@ -344,7 +346,8 @@ formset
         option text = STRING_TOKEN(STR_CPU_CPM_DISABLED), value = 0x0, flags = DEFAULT;
       endoneof;
     endif;
-//><ADLINK-MS20233010>//
+#endif
+//><ADLINK-MS20240403>//
   endform;
 
 endformset;

@@ -75,11 +75,15 @@ CpuNvParamGet (
 {
   EFI_STATUS Status;
   UINT32     Value;
-//><ADLINK-MS20233010>//
+  
+  
+//><ADLINK-MS20240403>//
+#if 0
   UINT32     CPMcount;
   UINT16     MaxCPM = 16;
   INTN       i;
-//><ADLINK-MS20233010>//
+#endif
+//><ADLINK-MS20240403>//
 
   ASSERT (Configuration != NULL);
 
@@ -95,7 +99,8 @@ CpuNvParamGet (
     Configuration->CpuSubNumaMode = Value;
   }
 
-//><ADLINK-MS20233010>//
+//><ADLINK-MS20240403>//
+#if 0
   CPMcount = GetNumberOfConfiguredCPMs(0);
 
   if (CPMcount == 0){
@@ -108,7 +113,8 @@ CpuNvParamGet (
       Configuration->CPMs[i] = 1;
     }
   }
-//><ADLINK-MS20233010>//
+#endif
+//><ADLINK-MS20240403>//
   return EFI_SUCCESS;
 }
 
@@ -120,11 +126,13 @@ CpuNvParamSet (
 {
   EFI_STATUS Status;
   UINT32     Value;
-//><ADLINK-MS20233010>//
+//><ADLINK-MS20240403>//
+#if 0
   UINT32     CPMcount = 0;
   UINT16     MaxCPM = 16;
   INTN       i;
-//><ADLINK-MS20233010>//
+ #endif
+//><ADLINK-MS20240403>//
 
   ASSERT (Configuration != NULL);
 
@@ -148,7 +156,8 @@ CpuNvParamSet (
       return Status;
     }
   }
-//><ADLINK-MS20233010>//
+//><ADLINK-MS20240403>//
+#if 0
   for (i=0; i<MaxCPM; i++){
     if (Configuration->CPMs[i] == 1){
       CPMcount++;
@@ -159,7 +168,8 @@ CpuNvParamSet (
   }
 
   SetNumberOfConfiguredCPMs(0, CPMcount);
-//><ADLINK-MS20233010>//
+#endif
+//><ADLINK-MS20240403>//
   return EFI_SUCCESS;
 }
 
