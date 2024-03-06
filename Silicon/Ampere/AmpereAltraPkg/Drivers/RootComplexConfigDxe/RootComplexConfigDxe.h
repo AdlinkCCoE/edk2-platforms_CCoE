@@ -24,9 +24,10 @@ extern UINT8 RootComplexConfigVfrBin[];
 // create a packagelist (which contains Form packages, String packages, etc).
 //
 extern UINT8 RootComplexConfigDxeStrings[];
-//><ADLINK-MS20232710>//
+//><ADLINK-MS20240604>//
 #define MAX_EDITABLE_ELEMENTS 11
-//><ADLINK-MS20232710>//
+#define MAX_EDITABLE_CONTROLLER_ELEMENTS 8
+//><ADLINK-MS20240604>//
 #define RC0_STATUS_OFFSET  \
   OFFSET_OF (ROOT_COMPLEX_CONFIG_VARSTORE_DATA, RCStatus[0])
 #define RC0_BIFUR_LO_OFFSET  \
@@ -123,4 +124,12 @@ PcieRCGetMaxGen (
   IN UINT8                    PcieIndex
   );
 //><ADLINK-MS20232710>//
+//><ADLINK-MS20240604>//
+UINT8
+PcieRCGetDefaultMaxGen (
+  IN UINTN			RCIndex,
+  IN SCREEN_PRIVATE_DATA	*PrivateData,
+  IN UINT8			PcieIndex
+  );
+//><ADLINK-MS20240604>//
 #endif /* BOARD_PCIE_SCREEN_H_ */

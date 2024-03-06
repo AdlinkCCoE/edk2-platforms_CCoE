@@ -102,6 +102,7 @@ typedef enum {
 //
 // Data structure to store the PCIe controller information
 //
+//><ADLINK-MS20240604>//
 typedef struct {
   PHYSICAL_ADDRESS  CsrBase;               // Base address of CSR block
   PHYSICAL_ADDRESS  SnpsRamBase;           // Base address of Synopsys SRAM
@@ -111,10 +112,12 @@ typedef struct {
   UINT8             CurWidth;              // Current lanes x2/x4/x8/x16
   UINT8             ID;                    // ID of the controller within Root Complex
   UINT8             DevNum;                // Device number as part of Bus:Dev:Func
+  UINT8             DefaultMaxGen;
   BOOLEAN           Active;                // Active? Used in bi-furcation mode
   BOOLEAN           LinkUp;                // PHY and PCIE linkup
   BOOLEAN           HotPlug;               // Hotplug support
 } AC01_PCIE_CONTROLLER;
+//><ADLINK-MS20240604>//
 
 //
 // Data structure to store the Root Complex information

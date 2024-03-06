@@ -486,7 +486,7 @@ DriverCallback (
     case 2:
       Value->u8 = PcieRCDevMapHighDefaultSetting ((QuestionId - 0x8002) / MAX_EDITABLE_ELEMENTS, PrivateData);
       break;
-//><ADLINK-MS20232710>//
+//><ADLINK-MS20240604>//
     case 3:
     case 4:
     case 5:
@@ -495,10 +495,10 @@ DriverCallback (
     case 8:
     case 9:
     case 10:
-      Value->u8 = PcieRCGetMaxGen((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData, (QuestionId - 0x8002) % MAX_EDITABLE_ELEMENTS);
+      Value->u8 = PcieRCGetDefaultMaxGen((QuestionId - 0x8002)/MAX_EDITABLE_ELEMENTS, PrivateData, (QuestionId - 0x8002) % MAX_EDITABLE_CONTROLLER_ELEMENTS);
       break;
     }
-//><ADLINK-MS20232710>//
+//><ADLINK-MS20240604>//
     break;
 
   case EFI_BROWSER_ACTION_RETRIEVE:
@@ -562,6 +562,20 @@ PcieRCActiveDefaultSetting (
 
   return RootComplex->DefaultActive;
 }
+//><ADLINK-MS20240604>//
+UINT8
+PcieRCGetDefaultMaxGen (
+  IN UINTN			RCIndex,
+  IN SCREEN_PRIVATE_DATA	*PrivateData,
+  IN UINT8			PcieIndex
+  )
+{
+
+  AC01_ROOT_COMPLEX *RootComplex = GetRootComplex(RCIndex);
+
+  return RootComplex->Pcie[PcieIndex].DefaultMaxGen;
+}
+//><ADLINK-MS20240604>//
 //><ADLINK-MS20232710>//
 UINT8
 PcieRCGetMaxGen (
