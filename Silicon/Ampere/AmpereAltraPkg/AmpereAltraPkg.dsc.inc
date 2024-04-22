@@ -443,7 +443,7 @@
   # Ampere Altra UART0
   # 
   # //><ADLINK-MS20240103>//
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x100002630000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x100002600000
   # //><ADLINK-MS20240103>//
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth|32
