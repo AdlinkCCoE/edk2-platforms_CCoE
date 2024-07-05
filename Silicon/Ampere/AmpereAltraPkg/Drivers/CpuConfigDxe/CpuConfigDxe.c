@@ -73,9 +73,10 @@ CpuNvParamGet (
 {
   EFI_STATUS Status;
   UINT32     Value;
-  UINT32     CPMcount;
-  UINT16     MaxCPM = 16;
-  INTN       i;
+//><ADLINK-MS20242406>//
+  UINT16     CPMCount;
+  UINT16     MaxCores; 
+//><ADLINK-MS20242406>//
 
   ASSERT (Configuration != NULL);
 
@@ -91,18 +92,20 @@ CpuNvParamGet (
     Configuration->CpuSubNumaMode = Value;
   }
 
-  CPMcount = GetNumberOfConfiguredCPMs(0);
+//><ADLINK-MS20242406>//
+  CPMCount = GetNumberOfConfiguredCPMs(0);
+  MaxCores = GetMaximumNumberOfCores();
 
-  if (CPMcount == 0){
-    for (i=0; i<MaxCPM; i++){
-      Configuration->CPMs[i] = 1;
-    }
+  if (CPMCount == 0) {
+    Configuration->NumActiveCores = MaxCores;
   }
   else {
-    for (i=0; i<CPMcount; i++){
-      Configuration->CPMs[i] = 1;
+    Configuration->NumActiveCores = CPMCount * 2;
+    if (Configuration->NumActiveCores > MaxCores) {
+      Configuration->NumActiveCores = MaxCores;
     }
   }
+//><ADLINK-MS20242406>//
   return EFI_SUCCESS;
 }
 
@@ -114,9 +117,6 @@ CpuNvParamSet (
 {
   EFI_STATUS Status;
   UINT32     Value;
-  UINT32     CPMcount = 0;
-  UINT16     MaxCPM = 16;
-  INTN       i;
 
   ASSERT (Configuration != NULL);
 
@@ -141,20 +141,16 @@ CpuNvParamSet (
     }
   }
 
-  for (i=0; i<MaxCPM; i++){
-    if (Configuration->CPMs[i] == 1){
-      CPMcount++;
-    }
-    else{
-      break;
-    }
+//><ADLINK-MS20242406>//
+  Status = SetNumberOfConfiguredCPMs(0, Configuration->NumActiveCores / 2);
+  DEBUG ((DEBUG_ERROR, "SetNumberOfConfiguredCPMs Status: %r\n", Status));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to set number of active cores: %r\n", Status));
+    ASSERT (0);
   }
-
-  SetNumberOfConfiguredCPMs(0, CPMcount);
-
-  return EFI_SUCCESS;
-}
-
+//><ADLINK-MS20242406>//
+  return Status;
+  }
 STATIC
 EFI_STATUS
 SetupDefaultSettings (
