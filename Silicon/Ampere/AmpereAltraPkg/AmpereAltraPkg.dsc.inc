@@ -544,11 +544,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor|L"ADLINK"
   gArmTokenSpaceGuid.PcdProcessorAssetTag|L"Not Set"
   
-  gArmTokenSpaceGuid.PcdSystemProductName|L"Ampere Altra Developer Platform"
+  gArmTokenSpaceGuid.PcdSystemProductName|L"AVA"
   gArmTokenSpaceGuid.PcdSystemVersion|L"A2"
   
   gArmTokenSpaceGuid.PcdBaseBoardManufacturer|L"ADLINK"
-  gArmTokenSpaceGuid.PcdBaseBoardProductName|L"Ampere Altra Developer Platform"
+  gArmTokenSpaceGuid.PcdBaseBoardProductName|L"AVA"
   gArmTokenSpaceGuid.PcdBaseBoardVersion|L"A2"
 
 [PcdsDynamicHii.common.DEFAULT]
