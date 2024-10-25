@@ -45,9 +45,7 @@ EFI_STATUS
 EFIAPI
 FlashGetNvRamInfo (
   OUT UINTN  *NvRamBase,
-  OUT UINT32 *NvRamSize,
-  OUT UINTN  *MiscBase     OPTIONAL,
-  OUT UINT32 *MiscSize     OPTIONAL
+  OUT UINT32 *NvRamSize
   );
 
 /**

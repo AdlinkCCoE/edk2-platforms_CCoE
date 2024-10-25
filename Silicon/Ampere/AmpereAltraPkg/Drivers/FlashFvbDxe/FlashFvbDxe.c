@@ -6,7 +6,6 @@
 
 **/
 
-#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/FlashLib.h>
 #include <Library/PcdLib.h>
@@ -362,7 +361,6 @@ FlashFvbDxeWrite (
     return EFI_DEVICE_ERROR;
   }
 
-  CopyMem ((UINT8 *)(UINTN)mNvStorageBase + Lba * mFlashBlockSize + Offset, Buffer, *NumBytes);
   return Status;
 }
 
@@ -488,7 +486,7 @@ FlashFvbDxeInitialize (
     ));
 
   // Get NV Flash information
-  Status = FlashGetNvRamInfo (&mNvFlashBase, &mNvFlashSize, NULL, NULL);
+  Status = FlashGetNvRamInfo (&mNvFlashBase, &mNvFlashSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to get Flash info\n", __FUNCTION__));
     return EFI_DEVICE_ERROR;
