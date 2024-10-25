@@ -15,8 +15,7 @@
 
 #include "FlashLibCommon.h"
 
-#define UEFI_MISC_SIZE        0x1000
-
+BOOLEAN                       gFlashLibRuntime = FALSE;
 UINT8                         *gFlashLibPhysicalBuffer;
 UINT8                         *gFlashLibVirtualBuffer;
 
@@ -35,9 +34,13 @@ ConvertToPhysicalBuffer (
   IN UINT32 Size
   )
 {
-  ASSERT (VirtualPtr != NULL);
-  CopyMem (gFlashLibVirtualBuffer, VirtualPtr, Size);
-  return gFlashLibPhysicalBuffer;
+  if (gFlashLibRuntime) {
+    ASSERT (VirtualPtr != NULL);
+    CopyMem (gFlashLibVirtualBuffer, VirtualPtr, Size);
+    return gFlashLibPhysicalBuffer;
+  }
+
+  return VirtualPtr;
 }
 
 /**
@@ -112,9 +115,7 @@ EFI_STATUS
 EFIAPI
 FlashGetNvRamInfo (
   OUT UINTN  *NvRamBase,
-  OUT UINT32 *NvRamSize,
-  OUT UINTN  *MiscBase     OPTIONAL,
-  OUT UINT32 *MiscSize     OPTIONAL
+  OUT UINT32 *NvRamSize
   )
 {
   EFI_MM_COMMUNICATE_NVRAM_INFO_RESPONSE    NvRamInfo;
@@ -138,10 +139,9 @@ FlashGetNvRamInfo (
   }
 
   if (NvRamInfo.Status == MM_SPINOR_RES_SUCCESS) {
-    ASSERT (NvRamInfo.NvRamSize > UEFI_MISC_SIZE);
 
     *NvRamBase = NvRamInfo.NvRamBase;
-    *NvRamSize = NvRamInfo.NvRamSize - UEFI_MISC_SIZE;
+    *NvRamSize = NvRamInfo.NvRamSize;
 
     DEBUG ((
       DEBUG_INFO,
@@ -150,16 +150,6 @@ FlashGetNvRamInfo (
       *NvRamBase,
       *NvRamSize
       ));
-  } else {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (MiscBase != NULL) {
-    *MiscBase = *NvRamBase + *NvRamSize;
-  }
-
-  if (MiscSize != NULL) {
-    *MiscSize = UEFI_MISC_SIZE;
   }
 
   return EFI_SUCCESS;

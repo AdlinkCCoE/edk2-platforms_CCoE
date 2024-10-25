@@ -28,15 +28,12 @@
   BaseMemoryLib
   DebugLib
   FlashLib
-  IpmiCommandLibExt
   MmCommunicationLib
   NVParamLib
   PcdLib
   PeimEntryPoint
   ResetSystemLib
-
-[Ppis]
-  gPeiIpmiPpiGuid              ### CONSUMES
+  AmpereCpuLib
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

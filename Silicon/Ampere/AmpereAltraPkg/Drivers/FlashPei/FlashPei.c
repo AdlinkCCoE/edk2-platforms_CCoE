@@ -12,13 +12,11 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/FlashLib.h>
-#include <Library/IpmiCommandLibExt.h>
 #include <Library/NVParamLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/ResetSystemLib.h>
-
-#define UUID_SIZE     PcdGetSize (PcdPlatformConfigUuid)
+#include <Library/AmpereCpuLib.h>
 
 /**
   Entry point function for the PEIM
@@ -36,21 +34,19 @@ FlashPeiEntryPoint (
   IN CONST EFI_PEI_SERVICES    **PeiServices
   )
 {
-  CHAR8                 BuildUuid[UUID_SIZE];
-  CHAR8                 StoredUuid[UUID_SIZE];
-  EFI_STATUS            Status;
-  IPMI_BOOT_FLAGS_INFO  BootFlags;
-  BOOLEAN               NeedToClearUserConfiguration;
-  UINT32                FWNvRamSize;
-  UINT32                NvRamSize;
-  UINT32                UefiMiscSize;
-  UINTN                 FWNvRamStartOffset;
-  UINTN                 NvRamAddress;
-  UINTN                 UefiMiscOffset;
+  CHAR8               BuildUuid[PcdGetSize (PcdPlatformConfigUuid)+sizeof(BOOLEAN)];
+  CHAR8               StoredUuid[sizeof (BuildUuid)];
+  CHAR8               NullUuid[PcdGetSize (PcdPlatformConfigUuid)];
+  EFI_STATUS          Status;
+  UINTN               FWNvRamStartOffset;
+  UINT32              FWNvRamSize;
+  UINTN               NvRamAddress;
+  UINT32              NvRamSize;
+  BOOLEAN             IsAc01;
 
-  NeedToClearUserConfiguration = FALSE;
-
-  CopyMem ((VOID *)BuildUuid, PcdGetPtr (PcdPlatformConfigUuid), UUID_SIZE);
+  IsAc01 = IsAc01Processor ();
+  CopyMem ((VOID *)BuildUuid, PcdGetPtr (PcdPlatformConfigUuid), sizeof (BuildUuid));
+  BuildUuid[sizeof (BuildUuid)-sizeof(IsAc01)]=IsAc01;
 
   NvRamAddress = PcdGet64 (PcdFlashNvStorageVariableBase64);
   NvRamSize = FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
@@ -65,14 +61,13 @@ FlashPeiEntryPoint (
     NvRamSize
     ));
 
-  Status = FlashGetNvRamInfo (&FWNvRamStartOffset, &FWNvRamSize, &UefiMiscOffset, &UefiMiscSize);
+  Status = FlashGetNvRamInfo (&FWNvRamStartOffset, &FWNvRamSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to get Flash NVRAM info %r\n", __FUNCTION__, Status));
     return Status;
   }
 
-  if (FWNvRamSize < (NvRamSize * 2)
-      || UefiMiscSize < UUID_SIZE) {
+  if (FWNvRamSize < (NvRamSize * 2 + sizeof (BuildUuid))) {
     //
     // NVRAM size provided by FW is not enough
     //
@@ -80,44 +75,30 @@ FlashPeiEntryPoint (
   }
 
   //
-  // Get Boot Flags from BMC to determine if an NVRAM clear request has been made or not.
-  //
-  Status = IpmiGetBootFlags (&BootFlags);
-  if (!EFI_ERROR (Status)) {
-    if (BootFlags.IsCmosClear) {
-      DEBUG ((DEBUG_INFO, "FlashPei: Clear-cmos option is selected\n"));
-      NeedToClearUserConfiguration = TRUE;
-    }
-
-    Status = IpmiClearCmosBootFlags ();
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "FlashPei: Failed to clear clear-cmos boot flags - %r\n", Status));
-      NeedToClearUserConfiguration = FALSE;
-    }
-  } else {
-    DEBUG ((DEBUG_ERROR, "FlashPei: Failed to get Boot Flags via IPMI - %r\n", Status));
-  }
-
-  //
-  // Get the Platform UUID stored in the very first bytes of the UEFI Misc.
+  // We stored BUILD UUID build at the offset NVRAM_SIZE * 2
   //
   Status = FlashReadCommand (
-             UefiMiscOffset,
+             FWNvRamStartOffset + NvRamSize * 2,
              (UINT8 *)StoredUuid,
-             UUID_SIZE
+             sizeof (StoredUuid)
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if ((CompareMem ((VOID *)StoredUuid, (VOID *)BuildUuid, UUID_SIZE)) != 0) {
-    DEBUG ((DEBUG_INFO, "BUILD UUID Changed, Update Storage with NVRAM FV\n"));
-    NeedToClearUserConfiguration = TRUE;
+  DEBUG ((DEBUG_INFO, "StoredUuid = "));
+  for (int i=0; i< sizeof (StoredUuid)-sizeof(IsAc01); i++) {
+    DEBUG ((DEBUG_INFO, "%x ", StoredUuid[i]));
   }
+  DEBUG ((DEBUG_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "stored IsAc01 = %x\n", StoredUuid[sizeof(StoredUuid)-sizeof(IsAc01)]));
+  DEBUG ((DEBUG_INFO, "IsAc01 = %x\n", IsAc01));
 
-  if (NeedToClearUserConfiguration) {
+  if (CompareMem ((VOID *)StoredUuid, (VOID *)BuildUuid, sizeof (BuildUuid)) != 0) {
+    DEBUG ((DEBUG_INFO, "BUILD UUID Changed, Update Storage with NVRAM FV\n"));
 
-    Status = FlashEraseCommand (FWNvRamStartOffset, NvRamSize * 2);
+    Status = FlashEraseCommand (FWNvRamStartOffset, NvRamSize * 2 + sizeof (BuildUuid));
+
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -134,26 +115,26 @@ FlashPeiEntryPoint (
     //
     // Write new BUILD UUID to the Flash
     //
-    Status = FlashEraseCommand (UefiMiscOffset, UUID_SIZE);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
     Status = FlashWriteCommand (
-               UefiMiscOffset,
+               FWNvRamStartOffset + NvRamSize * 2,
                (UINT8 *)BuildUuid,
-               UUID_SIZE
+               sizeof (BuildUuid)
                );
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    Status = NVParamClrAll ();
-    if (!EFI_ERROR (Status)) {
-      //
-      // Trigger reset to use default NVPARAM
-      //
-      ResetCold ();
+    for (int i=0; i<sizeof(NullUuid); i++) {
+      NullUuid[i] = 0xff;
+    }
+    if (CompareMem ((VOID *)StoredUuid, (VOID *)NullUuid, sizeof (NullUuid)) != 0) {
+      Status = NVParamClrAll ();
+      if (!EFI_ERROR (Status)) {
+        //
+        // Trigger reset to use default NVPARAM
+        //
+        ResetCold ();
+      }
     }
   } else {
     DEBUG ((DEBUG_INFO, "Identical UUID, copy stored NVRAM to RAM\n"));
